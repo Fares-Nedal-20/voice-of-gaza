@@ -16,9 +16,9 @@ export default function Header() {
     <Navbar className="border-b border-gray-300 shadow-md">
       <Link to={"/"}>
         <img
-          src="/logo.png"
+          src="/logo-_1_.svg"
           alt="logo"
-          className="h-9 w-16 rounded-lg object-cover bg-gray-400"
+          className=" h-10 w-14 rounded-full object-contain"
         />
       </Link>
       <form className="hidden md:inline">
