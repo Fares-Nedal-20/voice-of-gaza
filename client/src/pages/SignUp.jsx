@@ -1,7 +1,43 @@
-import { Button, Label, TextInput } from "flowbite-react";
+import { Alert, Button, Label, TextInput } from "flowbite-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function SignUp() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({});
+  console.log(formData, error);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("fares");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(true);
+        setLoading(false);
+        return;
+      } else {
+        setLoading(false);
+        setError(false);
+        console.log("User created successfully!");
+      }
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  };
+
   return (
     <div
       className="min-h-screen w-full bg-cover"
@@ -28,7 +64,7 @@ export default function SignUp() {
           </div>
           {/* right side */}
           <div className="flex-1">
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               <div className="flex flex-col gap-1">
                 <Label className="ml-1 text-gray-700 font-medium">
                   Username
@@ -37,6 +73,7 @@ export default function SignUp() {
                   type="text"
                   placeholder="Username..."
                   id="username"
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -45,6 +82,7 @@ export default function SignUp() {
                   type="email"
                   placeholder="company@gmail.com"
                   id="email"
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -55,9 +93,13 @@ export default function SignUp() {
                   type="password"
                   placeholder="***********"
                   id="password"
+                  onChange={handleChange}
                 />
               </div>
-              <Button className="uppercase bg-gradient-to-br from-slate-400 to-slate-700 text-white hover:bg-gradient-to-bl focus:ring-gray-100 dark:focus:ring-green-800">
+              <Button
+                type="submit"
+                className="uppercase bg-gradient-to-br from-slate-400 to-slate-700 text-white hover:bg-gradient-to-bl focus:ring-gray-100 dark:focus:ring-green-800"
+              >
                 Sign Up
               </Button>
             </form>
@@ -70,6 +112,11 @@ export default function SignUp() {
               </span>
               <span className="cursor-pointer">Sign out</span>
             </div>
+            {error && (
+              <Alert className="mt-5" color="failure">
+              Something went wrong!
+              </Alert>
+            )}
           </div>
         </div>
       </div>
