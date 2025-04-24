@@ -51,8 +51,6 @@ export const signup = async (req, res) => {
     }
   }
 
-  // another way using validator package
-
   try {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {

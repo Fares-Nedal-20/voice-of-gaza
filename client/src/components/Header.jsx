@@ -39,7 +39,7 @@ export default function Header() {
           <FaSun />
         </Button>
         <Link to={"/sign-in"}>
-          <Button className="bg-gradient-to-br from-purple-600 to-blue-500 text-white hover:bg-gradient-to-bl focus:ring-blue-300 dark:focus:ring-blue-800">
+          <Button className="bg-gradient-to-br from-green-400 to-blue-600 text-white hover:bg-gradient-to-bl focus:ring-green-200 dark:focus:ring-green-800">
             Sign In
           </Button>
         </Link>
