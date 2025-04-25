@@ -34,7 +34,7 @@ export const signup = async (req, res) => {
     if (!validator.isStrongPassword(password, { minLength: 6 })) {
       return res.status(400).json({
         message:
-          "Weak password(must contain lowercase, uppercase, numbers, symbols)",
+          "Weak password (must contain lowercase, uppercase, numbers, symbols)!",
       });
     }
   }

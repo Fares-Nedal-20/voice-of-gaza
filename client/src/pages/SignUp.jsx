@@ -1,12 +1,17 @@
-import { Alert, Button, Label, TextInput } from "flowbite-react";
+import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signUpStart,
+  signUpSuccess,
+  signUpFailure,
+} from "../redux/user/userSlice";
 
 export default function SignUp() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({});
-  console.log(formData, error);
+  const dispatch = useDispatch();
+  const { error, loading, currentUser } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -14,8 +19,7 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("fares");
-    setLoading(true);
+    dispatch(signUpStart());
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
@@ -24,17 +28,14 @@ export default function SignUp() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(true);
-        setLoading(false);
+        dispatch(signUpFailure(data.message));
         return;
       } else {
-        setLoading(false);
-        setError(false);
+        dispatch(signUpSuccess(data));
         console.log("User created successfully!");
       }
     } catch (error) {
-      setLoading(false);
-      setError(error.message);
+      dispatch(signUpFailure(error.message));
     }
   };
 
@@ -104,12 +105,20 @@ export default function SignUp() {
               <Button
                 type="submit"
                 className="uppercase bg-gradient-to-br from-slate-400 to-slate-700 text-white hover:bg-gradient-to-bl focus:ring-gray-100 dark:focus:ring-green-800 cursor-pointer"
+                disabled={loading}
               >
-                Sign Up
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Spinner size="sm" />
+                    <span>Loading...</span>
+                  </div>
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
             </form>
             <div className="text-red-600 mt-5 flex justify-between items-center text-sm">
-              <span className="cursor-pointer">
+              <span>
                 Have an account?{" "}
                 <Link to={"/sign-in"} className="text-blue-600 ml-1">
                   Sign in
@@ -119,7 +128,7 @@ export default function SignUp() {
             </div>
             {error && (
               <Alert className="mt-5" color="failure">
-                Something went wrong!
+                {error}
               </Alert>
             )}
           </div>
