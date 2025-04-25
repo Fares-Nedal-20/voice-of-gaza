@@ -32,7 +32,6 @@ export default function SignUp() {
         return;
       } else {
         dispatch(signUpSuccess(data));
-        console.log("User created successfully!");
       }
     } catch (error) {
       dispatch(signUpFailure(error.message));
@@ -126,7 +125,7 @@ export default function SignUp() {
               </span>
               <span className="cursor-pointer">Sign out</span>
             </div>
-            {error && (
+            {!loading && error && (
               <Alert className="mt-5" color="failure">
                 {error}
               </Alert>

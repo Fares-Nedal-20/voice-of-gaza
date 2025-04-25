@@ -60,7 +60,7 @@ export const signup = async (req, res, next) => {
     const hashedPassword = bcryptjs.hashSync(password, 10);
     const newUser = new User({ username, email, password: hashedPassword });
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1d", // sets how long the cookie should exist in the browser.
+      expiresIn: "1d", // After this time, the token becomes invalid.
     });
     await newUser.save(); // هان لما اعمل حفظ بيروح يتشيك على الرولز الخاصة بالموديل نفسه
     const { password: pass, ...rest } = newUser._doc;
@@ -68,7 +68,7 @@ export const signup = async (req, res, next) => {
       .status(201)
       .cookie("access_token", token, {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000, // sets how long the cookie should exist in the browser.
       })
       .json(rest);
   } catch (error) {
@@ -93,14 +93,14 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(401, "Invalid email or password!"));
     }
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1d", // sets how long the cookie should exist in the browser.
+      expiresIn: "1d", // After this time, the token becomes invalid.
     });
     const { password: pass, ...rest } = validUser._doc;
     res
       .status(200)
       .cookie("access_token", token, {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000, // sets how long the cookie should exist in the browser.
       })
       .json(rest);
   } catch (error) {
