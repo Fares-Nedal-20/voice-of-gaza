@@ -2,8 +2,9 @@ import User from "./../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import validator from "validator";
+import { errorHandler } from "../utils/error.js";
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
   //   console.log(req.body);
   const { username, email, password } = req.body;
   if (
@@ -14,14 +15,12 @@ export const signup = async (req, res) => {
     password === "" ||
     email === ""
   ) {
-    return res.status(400).json({ message: "All field are required!" });
+    return next(errorHandler(400, "All field are required!"));
   }
 
   if (username) {
     if (username.length < 8) {
-      return res
-        .status(400)
-        .json({ message: "Username must be 8 characters at least" });
+      return next(errorHandler(400, "Username must be 8 characters at least!"));
     }
   }
   if (password) {
@@ -32,10 +31,12 @@ export const signup = async (req, res) => {
     // }
 
     if (!validator.isStrongPassword(password, { minLength: 6 })) {
-      return res.status(400).json({
-        message:
-          "Weak password (must contain lowercase, uppercase, numbers, symbols)!",
-      });
+      return next(
+        errorHandler(
+          400,
+          "Weak password (must contain lowercase, uppercase, numbers, symbols)!"
+        )
+      );
     }
   }
 
@@ -47,16 +48,14 @@ export const signup = async (req, res) => {
     //       return res.status(400).json({ message: "Invalid email format" });
     //     }
     if (!validator.isEmail(email)) {
-      return res.status.json({ message: "Invalid email format!" });
+      return next(errorHandler(400, "Invalid email format!"));
     }
   }
 
   try {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Email or Username already exists!" });
+      return next(errorHandler(404, "Email or Username already exists!"));
     }
     const hashedPassword = bcryptjs.hashSync(password, 10);
     const newUser = new User({ username, email, password: hashedPassword });
@@ -71,6 +70,6 @@ export const signup = async (req, res) => {
       })
       .json(rest);
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 };
