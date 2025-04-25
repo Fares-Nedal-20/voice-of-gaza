@@ -11,7 +11,7 @@ import {
 export default function SignUp() {
   const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
-  const { error, loading, currentUser } = useSelector((state) => state.user);
+  const { error, loading } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
