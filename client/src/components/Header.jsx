@@ -5,17 +5,26 @@ import {
   NavbarLink,
   NavbarToggle,
   TextInput,
+  Dropdown,
+  Avatar,
+  DropdownHeader,
+  DropdownItem,
+  DropdownDivider,
 } from "flowbite-react";
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { themeToggle } from "../redux/theme/themeSlice";
+import { CgProfile } from "react-icons/cg";
+import { HiLogout } from "react-icons/hi";
 
 export default function Header() {
   const path = useLocation().pathname;
   const { theme } = useSelector((state) => state.theme);
+  const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
   return (
     <Navbar className="border-b border-gray-300 shadow-md">
       <Link to={"/"}>
@@ -42,11 +51,35 @@ export default function Header() {
         <Button pill color="light" onClick={() => dispatch(themeToggle())}>
           {theme === "light" ? <FaMoon /> : <FaSun />}
         </Button>
-        <Link to={"/sign-in"}>
-          <Button className="bg-gradient-to-br from-green-400 to-blue-600 text-white hover:bg-gradient-to-bl focus:ring-green-200 dark:focus:ring-green-800">
-            Sign In
-          </Button>
-        </Link>
+        {currentUser ? (
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar alt="user" img={currentUser.profilePicture} rounded />
+            }
+          >
+            <DropdownHeader>
+              <span className="block text-sm truncate">
+                {currentUser.username}
+              </span>
+              <span className="block text-sm truncate font-medium">
+                {currentUser.email}
+              </span>
+            </DropdownHeader>
+            <Link to={"/dashboard?tab=profile"}>
+              <DropdownItem icon={CgProfile}>Profile</DropdownItem>
+            </Link>
+            <DropdownDivider />
+            <DropdownItem icon={HiLogout}>Sign out</DropdownItem>
+          </Dropdown>
+        ) : (
+          <Link to={"/sign-in"}>
+            <Button className="bg-gradient-to-br from-green-400 to-blue-600 text-white hover:bg-gradient-to-bl focus:ring-green-200 dark:focus:ring-green-800">
+              Sign In
+            </Button>
+          </Link>
+        )}
         <NavbarToggle />
       </div>
       <NavbarCollapse>
