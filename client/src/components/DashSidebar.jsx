@@ -3,16 +3,17 @@ import {
   SidebarItem,
   SidebarItemGroup,
   SidebarItems,
+  SidebarLogo,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { HiLogout, HiUser, HiTable, HiLogin } from "react-icons/hi";
 import { Link, useLocation } from "react-router-dom";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 
 export default function DashSidebar() {
   const location = useLocation();
   const [tab, setTab] = useState("");
-  const {currentUser} = useSelector((state) => state.user)
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -24,6 +25,9 @@ export default function DashSidebar() {
 
   return (
     <Sidebar className="w-full">
+      <SidebarLogo img="./logo2.png" imgAlt="logo" href="/">
+        <span className="text-gray-700">Voice of Gaza</span>
+      </SidebarLogo>
       <SidebarItems>
         <SidebarItemGroup>
           <SidebarItem
