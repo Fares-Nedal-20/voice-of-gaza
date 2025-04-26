@@ -8,10 +8,14 @@ import {
 } from "flowbite-react";
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaSun } from "react-icons/fa";
+import { FaMoon, FaSun } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
+import { themeToggle } from "../redux/theme/themeSlice";
 
 export default function Header() {
   const path = useLocation().pathname;
+  const { theme } = useSelector((state) => state.theme);
+  const dispatch = useDispatch();
   return (
     <Navbar className="border-b border-gray-300 shadow-md">
       <Link to={"/"}>
@@ -35,8 +39,8 @@ export default function Header() {
       </Link>
       {/* for any tag, his order is 0 */}
       <div className="flex gap-2 md:order-1">
-        <Button pill color="light">
-          <FaSun />
+        <Button pill color="light" onClick={() => dispatch(themeToggle())}>
+          {theme === "light" ? <FaMoon /> : <FaSun />}
         </Button>
         <Link to={"/sign-in"}>
           <Button className="bg-gradient-to-br from-green-400 to-blue-600 text-white hover:bg-gradient-to-bl focus:ring-green-200 dark:focus:ring-green-800">
