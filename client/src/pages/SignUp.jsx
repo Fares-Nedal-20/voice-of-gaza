@@ -7,6 +7,7 @@ import {
   signUpSuccess,
   signUpFailure,
 } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
@@ -117,6 +118,7 @@ export default function SignUp() {
                   "Sign Up"
                 )}
               </Button>
+              <OAuth />
             </form>
             <div className="text-red-600 mt-5 flex justify-between items-center text-sm">
               <span>
