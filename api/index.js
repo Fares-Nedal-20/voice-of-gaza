@@ -3,12 +3,14 @@ import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 dotenv.config();
 
 app.use(express.json());
+app.use(cookieParser());
 
 mongoose
   .connect(process.env.MONGO_DB_URI)
@@ -24,8 +26,8 @@ app.use("/api/auth", authRoutes);
 
 app.use((err, req, res, next) => {
   if (err) {
-    const statusCode = err.statusCode;
-    const message = err.message;
+    const statusCode = err.statusCode || 500;
+    const message = err.message || "Internal server error";
     res.status(statusCode).json({
       success: false,
       statusCode,
