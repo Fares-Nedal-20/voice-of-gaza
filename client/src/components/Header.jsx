@@ -18,12 +18,28 @@ import { useSelector, useDispatch } from "react-redux";
 import { themeToggle } from "../redux/theme/themeSlice";
 import { CgProfile } from "react-icons/cg";
 import { HiLogout } from "react-icons/hi";
+import { signout } from "../redux/user/userSlice";
 
 export default function Header() {
   const path = useLocation().pathname;
   const { theme } = useSelector((state) => state.theme);
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
+  const handleSignOut = async () => {
+    try {
+      const res = await fetch("/api/auth/signout");
+      const data = await res.json();
+      if (!res.ok) {
+        return;
+      }
+      if (res.ok) {
+        dispatch(signout());
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   return (
     <Navbar className="border-b border-gray-300 shadow-md">
@@ -71,7 +87,9 @@ export default function Header() {
               <DropdownItem icon={CgProfile}>Profile</DropdownItem>
             </Link>
             <DropdownDivider />
-            <DropdownItem icon={HiLogout}>Sign out</DropdownItem>
+            <DropdownItem icon={HiLogout} onClick={handleSignOut}>
+              Sign out
+            </DropdownItem>
           </Dropdown>
         ) : (
           <Link to={"/sign-in"}>

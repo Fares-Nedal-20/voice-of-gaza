@@ -8,12 +8,14 @@ import {
 import { useEffect, useState } from "react";
 import { HiLogout, HiUser, HiTable, HiLogin } from "react-icons/hi";
 import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { signout } from "../redux/user/userSlice";
 
 export default function DashSidebar() {
   const location = useLocation();
   const [tab, setTab] = useState("");
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -22,6 +24,21 @@ export default function DashSidebar() {
       setTab(tabFromUrl);
     }
   }, [location.search]);
+
+  const handleSignOut = async () => {
+    try {
+      const res = await fetch("/api/auth/signout");
+      const data = await res.json();
+      if (!res.ok) {
+        return;
+      }
+      if (res.ok) {
+        dispatch(signout());
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   return (
     <Sidebar className="w-full">
@@ -47,7 +64,11 @@ export default function DashSidebar() {
           </SidebarItem>
         </SidebarItemGroup>
         <SidebarItemGroup>
-          <SidebarItem className="cursor-pointer" icon={HiLogout}>
+          <SidebarItem
+            className="cursor-pointer"
+            icon={HiLogout}
+            onClick={handleSignOut}
+          >
             Sign out
           </SidebarItem>
         </SidebarItemGroup>
