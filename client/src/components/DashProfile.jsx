@@ -177,138 +177,157 @@ export default function DashProfile() {
     }
   };
 
+  // className="min-h-screen w-full bg-cover"
+  // style={{
+  //   backgroundImage: "url('/bg-signup.png')",
+  //   backgroundColor: "rgba(255, 255, 255, 0.8)", // light overlay
+  //   backgroundBlendMode: "lighten", // blend white with image
+  // }}
+
   return (
-    <div className="w-full max-w-lg mx-auto p-3">
-      <h1 className="text-3xl text-center font-semibold my-7">Profile</h1>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        <div className="relative w-32 h-32 self-center rounded-full cursor-pointer overflow-hidden shadow-md">
-          {imageUploadingProgress && imageUploadingProgress > 0 && (
-            <CircularProgressbar
-              value={imageUploadingProgress}
-              text={`${imageUploadingProgress}%`}
-              styles={{
-                root: {
-                  width: "100%",
-                  height: "100%",
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                },
-                path: {
-                  stroke: `rgba(62,155,199, ${(
-                    imageUploadingProgress / 100
-                  ).toFixed(0)})`,
-                },
-              }}
-            />
-          )}
-          <img
-            src={fileImageURL || currentUser.profilePicture}
-            alt="user"
-            className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${
-              imageUploadingProgress &&
-              imageUploadingProgress < 100 &&
-              "opacity-80"
-            }`}
-            onClick={() => fileRef.current.click()}
-          />
-        </div>
-        <input
-          hidden
-          type="file"
-          accept="image/*"
-          ref={fileRef}
-          onChange={handleImageChange}
-        />
-        <div className="flex flex-col gap-1">
-          <Label className="ml-1 text-gray-700 font-medium">Username</Label>
-          <TextInput
-            placeholder="Username..."
-            id="username"
-            type="text"
-            defaultValue={currentUser.username}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <Label className="ml-1 text-gray-700 font-medium">Email</Label>
-          <TextInput
-            placeholder="Email..."
-            id="email"
-            type="email"
-            defaultValue={currentUser.email}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <Label className="ml-1 text-gray-700 font-medium">Password</Label>
-          <TextInput
-            placeholder="***********"
-            id="password"
-            type="password"
-            onChange={handleChange}
-          />
-        </div>
-        <Button
-          disabled={imageUploadingProgress || loading}
-          type="submit"
-          outline
-          color={"gray"}
-          className="cursor-pointer"
+    <div
+      className="min-h-screen w-full bg-cover"
+      style={{
+        backgroundImage: "url('/bg-signup.png')",
+        backgroundColor: "rgba(255, 255, 255, 0.8)", // light overlay
+        backgroundBlendMode: "lighten", // blend white with image
+      }}
+    >
+      <div className="w-full max-w-lg mx-auto p-3">
+        <h1 className="text-3xl text-center font-semibold my-7">Profile</h1>
+        <form
+          className="flex flex-col gap-4 shadow-md rounded-xl px-4 py-8 bg-white z-30"
+          onSubmit={handleSubmit}
         >
-          {!error && loading ? (
-            <div className="flex items-center gap-2">
-              <Spinner size="sm" />
-              <span>Uploading...</span>
-            </div>
-          ) : (
-            <span>Update User</span>
-          )}
-        </Button>
-      </form>
-      <div className="text-sm text-red-600 flex items-center justify-between mt-4">
-        <span className="cursor-pointer" onClick={() => setShowModal(true)}>
-          Delete account
-        </span>
-        <span className="cursor-pointer" onClick={handleSignOut}>
-          Sign out
-        </span>
-      </div>
-      {(error || imageUploadingError) && (
-        <Alert color="failure" className="mt-5">
-          {error || imageUploadingError}
-        </Alert>
-      )}
-      <Modal
-        show={showModal}
-        popup
-        size="md"
-        onClose={() => setShowModal(false)}
-      >
-        <ModalHeader />
-        <ModalBody className="flex flex-col items-center gap-6">
-          <HiOutlineExclamationCircle className="w-18 h-18 text-gray-400" />
-          <p className="font-medium text-gray-500">
-            Are you sure you want to delete your account?
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <Button
-              color="red"
-              className="cursor-pointer"
-              onClick={handleDeleteUser}
-            >
-              Yes, I'm sure
-            </Button>
-            <Button
-              color="alternative"
-              className="cursor-pointer"
-              onClick={() => setShowModal(false)}
-            >
-              No, Cancel
-            </Button>
+          <div className="relative w-32 h-32 self-center rounded-full cursor-pointer overflow-hidden shadow-md">
+            {imageUploadingProgress && imageUploadingProgress > 0 && (
+              <CircularProgressbar
+                value={imageUploadingProgress}
+                text={`${imageUploadingProgress}%`}
+                styles={{
+                  root: {
+                    width: "100%",
+                    height: "100%",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                  },
+                  path: {
+                    stroke: `rgba(62,155,199, ${(
+                      imageUploadingProgress / 100
+                    ).toFixed(0)})`,
+                  },
+                }}
+              />
+            )}
+            <img
+              src={fileImageURL || currentUser.profilePicture}
+              alt="user"
+              className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${
+                imageUploadingProgress &&
+                imageUploadingProgress < 100 &&
+                "opacity-80"
+              }`}
+              onClick={() => fileRef.current.click()}
+            />
           </div>
-        </ModalBody>
-      </Modal>
+          <input
+            hidden
+            type="file"
+            accept="image/*"
+            ref={fileRef}
+            onChange={handleImageChange}
+          />
+          <div className="flex flex-col gap-1">
+            <Label className="ml-1 text-gray-700 font-medium">Username</Label>
+            <TextInput
+              placeholder="Username..."
+              id="username"
+              type="text"
+              defaultValue={currentUser.username}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label className="ml-1 text-gray-700 font-medium">Email</Label>
+            <TextInput
+              placeholder="Email..."
+              id="email"
+              type="email"
+              defaultValue={currentUser.email}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label className="ml-1 text-gray-700 font-medium">Password</Label>
+            <TextInput
+              placeholder="***********"
+              id="password"
+              type="password"
+              onChange={handleChange}
+            />
+          </div>
+          <Button
+            disabled={imageUploadingProgress || loading}
+            type="submit"
+            outline
+            color={"gray"}
+            className="cursor-pointer"
+          >
+            {!error && loading ? (
+              <div className="flex items-center gap-2">
+                <Spinner size="sm" />
+                <span>Uploading...</span>
+              </div>
+            ) : (
+              <span>Update User</span>
+            )}
+          </Button>
+          <div className="text-sm text-red-600 flex items-center justify-between mt-4">
+            <span className="cursor-pointer" onClick={() => setShowModal(true)}>
+              Delete account
+            </span>
+            <span className="cursor-pointer" onClick={handleSignOut}>
+              Sign out
+            </span>
+          </div>
+        </form>
+        {(error || imageUploadingError) && (
+          <Alert color="failure" className="mt-5">
+            {error || imageUploadingError}
+          </Alert>
+        )}
+        <Modal
+          show={showModal}
+          popup
+          size="md"
+          onClose={() => setShowModal(false)}
+        >
+          <ModalHeader />
+          <ModalBody className="flex flex-col items-center gap-6">
+            <HiOutlineExclamationCircle className="w-18 h-18 text-gray-400" />
+            <p className="font-medium text-gray-500">
+              Are you sure you want to delete your account?
+            </p>
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                color="red"
+                className="cursor-pointer"
+                onClick={handleDeleteUser}
+              >
+                Yes, I'm sure
+              </Button>
+              <Button
+                color="alternative"
+                className="cursor-pointer"
+                onClick={() => setShowModal(false)}
+              >
+                No, Cancel
+              </Button>
+            </div>
+          </ModalBody>
+        </Modal>
+      </div>
     </div>
   );
 }

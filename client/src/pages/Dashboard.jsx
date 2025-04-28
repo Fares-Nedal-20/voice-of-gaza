@@ -16,9 +16,9 @@ export default function Dashboard() {
   }, [location.search]);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen">
       {/* left side */}
-      <div className="w-56">
+      <div className="w-full md:w-56">
         <DashSidebar />
       </div>
       {/* right side */}

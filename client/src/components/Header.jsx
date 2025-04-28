@@ -66,13 +66,13 @@ export default function Header() {
       <div className="flex gap-2 md:order-1">
         <Button pill color="light" onClick={() => dispatch(themeToggle())}>
           {theme === "light" ? <FaMoon /> : <FaSun />}
-        </Button>
+        </Button >
         {currentUser ? (
           <Dropdown
             arrowIcon={false}
             inline
             label={
-              <Avatar alt="user" img={currentUser.profilePicture} rounded />
+              <Avatar alt="user" img={currentUser.profilePicture} rounded className="cursor-pointer"/>
             }
           >
             <DropdownHeader>
