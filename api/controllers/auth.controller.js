@@ -59,9 +59,13 @@ export const signup = async (req, res, next) => {
     }
     const hashedPassword = bcryptjs.hashSync(password, 10);
     const newUser = new User({ username, email, password: hashedPassword });
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1d", // After this time, the token becomes invalid.
-    });
+    const token = jwt.sign(
+      { id: newUser._id, role: newUser.role },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "1d", // After this time, the token becomes invalid.
+      }
+    );
     await newUser.save(); // هان لما اعمل حفظ بيروح يتشيك على الرولز الخاصة بالموديل نفسه
     const { password: pass, ...rest } = newUser._doc;
     res
@@ -92,9 +96,13 @@ export const signin = async (req, res, next) => {
     if (!validPassword) {
       return next(errorHandler(401, "Invalid email or password!"));
     }
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1d", // After this time, the token becomes invalid.
-    });
+    const token = jwt.sign(
+      { id: validUser._id, role: validUser.role },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "1d", // After this time, the token becomes invalid.
+      }
+    );
     const { password: pass, ...rest } = validUser._doc;
     res
       .status(200)
@@ -114,9 +122,13 @@ export const google = async (req, res, next) => {
   try {
     const user = await User.findOne({ email });
     if (user) {
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
-        expiresIn: "1d",
-      });
+      const token = jwt.sign(
+        { id: user._id, role: user.role },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "1d",
+        }
+      );
       const { password: pass, ...rest } = user._doc;
       res
         .status(200)
@@ -138,9 +150,13 @@ export const google = async (req, res, next) => {
         email,
         profilePicture,
       });
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET_KEY, {
-        expiresIn: "1d",
-      });
+      const token = jwt.sign(
+        { id: newUser._id, role: newUser.role },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "1d",
+        }
+      );
       await newUser.save();
       const { password: pass, ...rest } = newUser._doc;
       res
