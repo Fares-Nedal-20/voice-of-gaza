@@ -8,6 +8,7 @@ import Header from "./components/Header";
 import FooterComp from "./components/FooterComp";
 import PrivateRoute from "./components/PrivateRoute";
 import CreatePost from "./pages/CreatePost";
+import WriterOnlyPrivateRoute from "./components/WriterOnlyPrivateRoute";
 export default function App() {
   return (
     <BrowserRouter>
@@ -20,7 +21,9 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
-        <Route path="/create-post" element={<CreatePost />} />
+        <Route element={<WriterOnlyPrivateRoute />}>
+          <Route path="/create-post" element={<CreatePost />} />
+        </Route>
       </Routes>
       <FooterComp />
     </BrowserRouter>
