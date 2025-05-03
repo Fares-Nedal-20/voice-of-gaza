@@ -155,3 +155,80 @@ export const updatePost = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getPosts = async (req, res, next) => {
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.sort === "asc" ? 1 : -1;
+
+    // this code is work but its not clean and slow
+
+    /* const posts = await Post.find({
+      ...(req.query.postId && { _id: req.query.postId }),
+      ...(req.query.authorId && { authorId: req.query.authorId }),
+      ...(req.query.slug && { slug: req.query.slug }),
+      ...(req.query.category && { category: req.query.category }),
+      ...(req.query.searchTerm && {
+        $or: [
+          { title: { $regex: req.query.searchTerm, $options: "i" } },
+          { content: { $regex: req.query.searchTerm, $options: "i" } },
+        ],
+      }),
+    })
+      .sort({ updatedAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+
+    const totalPosts = await Post.countDocuments();
+
+    const now = new Date();
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+
+    const lastMonthPosts = await Post.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
+    }); */
+
+    // this code is more readability, performance, and robustness
+
+    const query = {};
+
+    if (req.query.postId) query._id = req.query.postId;
+    if (req.query.authorId) query.authorId = req.query.authorId;
+    if (req.query.slug) query.slug = req.query.slug;
+    if (req.query.category) query.category = req.query.category;
+    if (req.query.searchTerm) {
+      query.$or = [
+        { title: { $regex: req.query.searchTerm, $options: "i" } },
+        { category: { $regex: req.query.searchTerm, $options: "i" } },
+      ];
+    }
+
+    const now = new Date();
+    const oneMonthAgo = new Date(now);
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+
+    // Promise.all() waits until all three finish, so this way is faster than the previous way
+
+    const [posts, totalPosts, lastMonthPosts] = await Promise.all([
+      Post.find(query)
+        .sort({ updatedAt: sortDirection })
+        .skip(startIndex)
+        .limit(limit),
+      Post.countDocuments(query), // Count based on the same filters
+      Post.countDocuments({ createdAt: { $gte: oneMonthAgo } }),
+    ]);
+
+    res.status(200).json({
+      posts,
+      totalPosts,
+      lastMonthPosts,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
