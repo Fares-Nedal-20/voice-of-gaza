@@ -103,6 +103,8 @@ export const deleteUser = async (req, res, next) => {
 export const getUsers = async (req, res, next) => {
   try {
     const { value: validatedQuery, error } = querySchema.validate(req.query);
+
+    console.log(validatedQuery);
     if (error) {
       return next(errorHandler(400, error.details[0].message));
     }
@@ -131,7 +133,7 @@ export const getUsers = async (req, res, next) => {
         .limit(limit)
         .lean(),
       User.countDocuments(queryToSearch),
-      User.countDocuments({ createdAt: { $gte: lastMonthUsers } }),
+      User.countDocuments({ createdAt: { $gte: oneMonthAgo } }),
     ]);
 
     res.status(200).json({
