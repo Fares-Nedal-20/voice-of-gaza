@@ -2,6 +2,17 @@ import User from "../models/user.model.js";
 import { errorHandler } from "../utils/error.js";
 import validator from "validator";
 import bcryptjs from "bcryptjs";
+import Joi from "joi";
+
+const querySchema = Joi.object({
+  startIndex: Joi.number().integer().min(0).default(0),
+  limit: Joi.number().integer().min(1).max(18).default(9),
+  sort: Joi.string().valid("asc", "desc").default("desc"),
+  userId: Joi.string().hex().length(24),
+  username: Joi.string().alphanum().min(1).max(50),
+  email: Joi.string().email(),
+  role: Joi.string().valid("admin", "writer", "reader"),
+});
 
 export const test = (req, res) => {
   res.json({ message: "Api route is working!" });
@@ -84,6 +95,88 @@ export const deleteUser = async (req, res, next) => {
   try {
     await User.findByIdAndDelete(req.params.userId);
     res.status(200).clearCookie("access_token").json("User has been deleted!");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUsers = async (req, res, next) => {
+  try {
+    const { value: validatedQuery, error } = querySchema.validate(req.query);
+    if (error) {
+      return next(errorHandler(400, error.details[0].message));
+    }
+
+    const { startIndex, limit, sort, username, email, role, userId } =
+      validatedQuery;
+
+    const sortDirection = sort === "asc" ? 1 : -1;
+
+    const queryToSearch = {};
+
+    if (userId) queryToSearch._id = userId;
+    if (username) queryToSearch.username = { $regex: username, $options: "i" };
+    if (email) queryToSearch.email = { $regex: email, $options: "i" };
+    if (role) queryToSearch.role = role;
+
+    const now = new Date();
+    const oneMonthAgo = new Date(now);
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+
+    const [users, totalUsers, lastMonthUsers] = await Promise.all([
+      User.find(queryToSearch)
+        .select("-password")
+        .sort({ createdAt: sortDirection })
+        .skip(startIndex)
+        .limit(limit)
+        .lean(),
+      User.countDocuments(queryToSearch),
+      User.countDocuments({ createdAt: { $gte: lastMonthUsers } }),
+    ]);
+
+    res.status(200).json({
+      users,
+      totalUsers,
+      lastMonthUsers,
+    });
+
+    /*
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.sort === "asc" ? 1 : -1;
+
+    const queryToSearch = {};
+    if (req.query.userId) queryToSearch._id = req.query.userId;
+    if (req.query.username) {
+      queryToSearch.username = { $regex: req.query.username, $options: "i" };
+    }
+    if (req.query.email) {
+      queryToSearch.email = { $regex: req.query.email, $options: "i" };
+    }
+    if (req.query.role) queryToSearch.role = req.query.role;
+
+    const now = new Date();
+    const oneMonthAgo = new Date(now);
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+
+    const [users, totalUsers, lastMonthUsers] = await Promise.all([
+      User.find(queryToSearch)
+        .select("-password")
+        .sort({ createdAt: sortDirection })
+        .skip(startIndex)
+        .limit(limit)
+        .lean(),
+      User.countDocuments(queryToSearch),
+      User.countDocuments({ createdAt: { $gte: oneMonthAgo } }),
+    ]);
+
+    // const usersWithoutPassword = users.map((user) => {
+    //   const { password: pass, ...rest } = user._doc;
+    //   return rest;
+    // });
+
+    res.status(200).json({ users, totalUsers, lastMonthUsers });
+    */
   } catch (error) {
     next(error);
   }
