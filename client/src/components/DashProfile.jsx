@@ -304,8 +304,8 @@ export default function DashProfile() {
           onClose={() => setShowModal(false)}
         >
           <ModalHeader />
-          <ModalBody className="flex flex-col items-center gap-6">
-            <HiOutlineExclamationCircle className="w-18 h-18 text-gray-400" />
+          <ModalBody className="flex flex-col items-center gap-4">
+            <HiOutlineExclamationCircle className="w-16 h-16 text-gray-400" />
             <p className="font-medium text-gray-500">
               Are you sure you want to delete your account?
             </p>
