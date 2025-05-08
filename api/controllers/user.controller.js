@@ -4,16 +4,6 @@ import validator from "validator";
 import bcryptjs from "bcryptjs";
 import Joi from "joi";
 
-const querySchema = Joi.object({
-  startIndex: Joi.number().integer().min(0).default(0),
-  limit: Joi.number().integer().min(1).max(18).default(9),
-  sort: Joi.string().valid("asc", "desc").default("desc"),
-  userId: Joi.string().hex().length(24),
-  username: Joi.string().alphanum().min(1).max(50),
-  email: Joi.string().email(),
-  role: Joi.string().valid("admin", "writer", "reader"),
-});
-
 export const test = (req, res) => {
   res.json({ message: "Api route is working!" });
 };
@@ -108,6 +98,17 @@ export const deleteUser = async (req, res, next) => {
 };
 
 export const getUsers = async (req, res, next) => {
+  const querySchema = Joi.object({
+    startIndex: Joi.number().integer().min(0).default(0),
+    limit: Joi.number().integer().min(1).max(18).default(9),
+    sort: Joi.string().valid("asc", "desc").default("desc"),
+    userId: Joi.string().hex().length(24),
+    username: Joi.string().alphanum().min(1).max(50),
+    email: Joi.string().email(),
+    role: Joi.string().valid("admin", "writer", "reader", "all"),
+    tab: Joi.string(),
+  });
+
   try {
     const { value: validatedQuery, error } = querySchema.validate(req.query);
 
@@ -126,7 +127,9 @@ export const getUsers = async (req, res, next) => {
     if (userId) queryToSearch._id = userId;
     if (username) queryToSearch.username = { $regex: username, $options: "i" };
     if (email) queryToSearch.email = { $regex: email, $options: "i" };
-    if (role) queryToSearch.role = role;
+    if (role && role !== "all") {
+      queryToSearch.role = role;
+    }
 
     const now = new Date();
     const oneMonthAgo = new Date(now);
