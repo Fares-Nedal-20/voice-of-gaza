@@ -10,6 +10,7 @@ import { HiLogout, HiUser, HiTable, HiLogin } from "react-icons/hi";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signout } from "../redux/user/userSlice";
+import { FaUsers } from "react-icons/fa";
 
 export default function DashSidebar() {
   const location = useLocation();
@@ -56,6 +57,11 @@ export default function DashSidebar() {
           >
             <Link to={"/dashboard?tab=profile"}>Profile</Link>
           </SidebarItem>
+          {currentUser?.role === "admin" && (
+            <SidebarItem active={tab === "users"} icon={FaUsers} as={"div"}>
+              <Link to={"/dashboard?tab=users"}>Users</Link>
+            </SidebarItem>
+          )}
           <SidebarItem icon={HiLogin} as={"div"}>
             <Link to={"/sign-in"}>Sign in</Link>
           </SidebarItem>
