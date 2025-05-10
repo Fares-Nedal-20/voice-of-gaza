@@ -71,9 +71,16 @@ export default function DashUsers() {
   }, [currentUser._id, location.search]);
 
   const handleShowMore = async () => {
+    const urlParams = new URLSearchParams(location.search);
+    const usernameFromUrl = urlParams.get("username");
+    const emailFromUrl = urlParams.get("email");
+    const roleFromUrl = urlParams.get("role");
+    const searchQuery = urlParams.toString();
     const startIndex = users.length;
     try {
-      const res = await fetch(`/api/user/getUsers?startIndex=${startIndex}`);
+      const res = await fetch(
+        `/api/user/getUsers?startIndex=${startIndex}&${searchQuery}`
+      );
       const data = await res.json();
       if (!res.ok) {
         return setShowMore(false);
@@ -173,7 +180,11 @@ export default function DashUsers() {
           </div>
           <div className="flex flex-col gap-1 flex-1">
             <Label className="ml-1 text-gray-800">Role</Label>
-            <Select onChange={handleChange} id="role" defaultValue={"all"}>
+            <Select
+              onChange={handleChange}
+              id="role"
+              value={searchData.role || "all"}
+            >
               <option value="all">All</option>
               <option value="admin">Admin</option>
               <option value="writer">Writer</option>
