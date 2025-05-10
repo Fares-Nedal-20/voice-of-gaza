@@ -47,6 +47,7 @@ export default function DashUsers() {
 
     const fetchUsers = async () => {
       setShowUsersError(null);
+      setShowMore(true);
       try {
         const searchQuery = urlParams.toString();
         const res = await fetch(`/api/user/getUsers?${searchQuery}`);
@@ -89,6 +90,8 @@ export default function DashUsers() {
         setUsers([...users, ...data.users]);
         if (data.users.length < 9) {
           setShowMore(false);
+        } else {
+          setShowMore(true);
         }
       }
     } catch (error) {}
