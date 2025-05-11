@@ -1,3 +1,4 @@
+import Joi from "joi";
 import Post from "../models/post.model.js";
 import { errorHandler } from "../utils/error.js";
 
@@ -157,10 +158,34 @@ export const updatePost = async (req, res, next) => {
 };
 
 export const getPosts = async (req, res, next) => {
+  const querySchema = Joi.object({
+    startIndex: Joi.number().integer().min(0).default(0),
+    limit: Joi.number().integer().min(1).max(18).default(9),
+    sort: Joi.string().valid("asc", "desc").default("desc"),
+    postId: Joi.string().hex().length(24),
+    authorId: Joi.string().hex().length(24),
+    slug: Joi.string().min(1),
+    category: Joi.string().min(1),
+    searchTerm: Joi.string().min(1),
+  }).unknown(true);
   try {
-    const startIndex = parseInt(req.query.startIndex) || 0;
-    const limit = parseInt(req.query.limit) || 9;
-    const sortDirection = req.query.sort === "asc" ? 1 : -1;
+    const { value: validatedQuery, error } = querySchema.validate(req.query);
+    if (error) {
+      return next(errorHandler(400, error.details[0].message));
+    }
+
+    const {
+      startIndex,
+      limit,
+      sort,
+      postId,
+      authorId,
+      slug,
+      category,
+      searchTerm,
+    } = validatedQuery;
+
+    const sortDirection = sort === "asc" ? 1 : -1;
 
     // this code is work but its not clean and slow
 
@@ -197,14 +222,15 @@ export const getPosts = async (req, res, next) => {
 
     const query = {};
 
-    if (req.query.postId) query._id = req.query.postId;
-    if (req.query.authorId) query.authorId = req.query.authorId;
-    if (req.query.slug) query.slug = req.query.slug;
-    if (req.query.category) query.category = req.query.category;
+    if (req.query.postId) query._id = postId;
+    if (req.query.authorId) query.authorId = authorId;
+    if (req.query.slug) query.slug = { $regex: slug, $options: "i" };
+    if (req.query.category)
+      query.category = { $regex: category, $options: "i" };
     if (req.query.searchTerm) {
       query.$or = [
-        { title: { $regex: req.query.searchTerm, $options: "i" } },
-        { category: { $regex: req.query.searchTerm, $options: "i" } },
+        { title: { $regex: searchTerm, $options: "i" } },
+        { content: { $regex: searchTerm, $options: "i" } },
       ];
     }
 
