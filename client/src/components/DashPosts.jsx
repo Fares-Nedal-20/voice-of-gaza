@@ -1,12 +1,17 @@
 import {
+  Modal,
+  ModalBody,
+  ModalHeader,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeadCell,
   TableRow,
+  Button,
 } from "flowbite-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useSelector } from "react-redux";
 
 export default function DashPosts() {
@@ -14,7 +19,8 @@ export default function DashPosts() {
   const [posts, setPosts] = useState([]);
   const [showMore, setShowMore] = useState(true);
   const [authors, setAuthors] = useState({});
-  console.log(authors);
+  const [showModal, setShowModal] = useState(false);
+  const [postIdToBeDeleted, setPostIdToBeDeleted] = useState(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -78,6 +84,26 @@ export default function DashPosts() {
     }
   };
 
+  const handleDeletePosts = async (postId) => {
+    try {
+      setShowModal(false);
+      const res = await fetch(`/api/post/deletePost/${postId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return;
+      }
+      if (res.ok) {
+        setPosts((prev) =>
+          prev.filter((post) => post._id !== postIdToBeDeleted)
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="px-3 py-4 table-auto md:mx-auto overflow-x-auto scrollbar scrollbar-thumb-slate-700 scrollbar-track-slate-300">
       <Table hoverable className="shadow-md bg-white">
@@ -102,7 +128,7 @@ export default function DashPosts() {
                 <TableCell>
                   {post.image && (
                     <img
-                      className="w-10 h-10 object-cover rounded-full bg-gray-300"
+                      className="w-14 h-10 object-cover rounded-sm bg-gray-300"
                       src={post.image}
                       alt={post.title}
                     />
@@ -122,7 +148,13 @@ export default function DashPosts() {
                     <span className="block text-green-500 cursor-pointer hover:underline">
                       Edit
                     </span>
-                    <span className="block text-red-500 cursor-pointer hover:underline">
+                    <span
+                      onClick={() => {
+                        setShowModal(true);
+                        setPostIdToBeDeleted(post._id);
+                      }}
+                      className="block text-red-500 cursor-pointer hover:underline"
+                    >
                       Delete
                     </span>
                   </div>
@@ -131,7 +163,7 @@ export default function DashPosts() {
             ))}
         </TableBody>
       </Table>
-      {posts && showMore && (
+      {posts.length > 0 && showMore && (
         <button
           onClick={handleShowMore}
           className="my-7 cursor-pointer hover:underline text-teal-500 text-center w-full"
@@ -139,6 +171,36 @@ export default function DashPosts() {
           Show More
         </button>
       )}
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <ModalHeader />
+        <ModalBody className="flex flex-col items-center gap-6">
+          <HiOutlineExclamationCircle className="w-16 h-16 text-gray-400" />
+          <p className="font-medium text-gray-500">
+            Are you sure you want to delete this post?
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Button
+              color="red"
+              className="cursor-pointer"
+              onClick={() => handleDeletePosts(postIdToBeDeleted)}
+            >
+              Yes, I'm sure
+            </Button>
+            <Button
+              color="alternative"
+              className="cursor-pointer"
+              onClick={() => setShowModal(false)}
+            >
+              No, Cancel
+            </Button>
+          </div>
+        </ModalBody>
+      </Modal>
     </div>
   );
 }
