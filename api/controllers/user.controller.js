@@ -112,7 +112,7 @@ export const getUsers = async (req, res, next) => {
   try {
     const { value: validatedQuery, error } = querySchema.validate(req.query);
 
-    console.log(validatedQuery);
+    // console.log(validatedQuery);
     if (error) {
       return next(errorHandler(400, error.details[0].message));
     }

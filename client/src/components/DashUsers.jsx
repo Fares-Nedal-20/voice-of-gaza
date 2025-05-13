@@ -84,7 +84,8 @@ export default function DashUsers() {
       );
       const data = await res.json();
       if (!res.ok) {
-        return setShowMore(false);
+        setShowMore(false);
+        return;
       }
       if (res.ok) {
         setUsers([...users, ...data.users]);
