@@ -256,13 +256,15 @@ export default function DashUsers() {
                         {user.role}
                       </TableCell>
                       <TableCell>
-                        <FaTimes
-                          onClick={() => {
-                            setShowModal(true);
-                            setUserIdToBeDeleted(user._id);
-                          }}
-                          className="text-red-500 text-lg cursor-pointer"
-                        />
+                        {user.role !== "admin" && (
+                          <FaTimes
+                            onClick={() => {
+                              setShowModal(true);
+                              setUserIdToBeDeleted(user._id);
+                            }}
+                            className="text-red-500 text-lg cursor-pointer"
+                          />
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
