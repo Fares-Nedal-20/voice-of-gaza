@@ -16,7 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function DashPosts() {
   const location = useLocation();
@@ -258,9 +258,11 @@ export default function DashPosts() {
                   <TableCell>{post.category}</TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1 items-center">
-                      <span className="block text-green-500 cursor-pointer hover:underline">
-                        Edit
-                      </span>
+                      <Link to={`/update-post/${post._id}`}>
+                        <span className="block text-green-500 cursor-pointer hover:underline">
+                          Edit
+                        </span>
+                      </Link>
                       <span
                         onClick={() => {
                           setShowModal(true);

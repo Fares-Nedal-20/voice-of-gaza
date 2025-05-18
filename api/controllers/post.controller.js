@@ -114,6 +114,7 @@ export const updatePost = async (req, res, next) => {
     if (req.body.title || req.body.content) {
       const newTitle = req.body.title || post.title;
       const newContent = req.body.content || post.content;
+      // checks if any of the keywords appear in the combined string of title + content
       const isRelated = new RegExp(keywords.join("|"), "i").test(
         `${newTitle} ${newContent}`
       );

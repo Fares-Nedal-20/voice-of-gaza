@@ -9,6 +9,7 @@ import FooterComp from "./components/FooterComp";
 import PrivateRoute from "./components/PrivateRoute";
 import CreatePost from "./pages/CreatePost";
 import WriterOnlyPrivateRoute from "./components/WriterOnlyPrivateRoute";
+import UpdatePost from "./pages/UpdatePost";
 export default function App() {
   return (
     <BrowserRouter>
@@ -23,6 +24,7 @@ export default function App() {
         </Route>
         <Route element={<WriterOnlyPrivateRoute />}>
           <Route path="/create-post" element={<CreatePost />} />
+          <Route path="/update-post/:postId" element={<UpdatePost />} />
         </Route>
       </Routes>
       <FooterComp />
