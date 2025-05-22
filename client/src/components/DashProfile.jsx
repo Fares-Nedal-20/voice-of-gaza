@@ -9,6 +9,7 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
+  ButtonGroup,
 } from "flowbite-react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -20,6 +21,9 @@ import {
   signout,
 } from "../redux/user/userSlice";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { MdOutlineArticle, MdPostAdd } from "react-icons/md";
+import { Link } from "react-router-dom";
+import PostCard from "./PostCard";
 
 export default function DashProfile() {
   const [file, setFile] = useState(null);
@@ -27,9 +31,14 @@ export default function DashProfile() {
   const [imageUploadingError, setImageUploadingError] = useState(null);
   const [imageUploadingProgress, setImageUploadingProgress] = useState(null);
   const [formData, setFormData] = useState({});
-  const [showModal, setShowModal] = useState(false);
+  const [showModalForDeleteUser, setShowModalForDeleteUser] = useState(false);
+  const [showModalForDeletePost, setShowModalForDeletePost] = useState(false);
+  const [showMyOwnPosts, setShowMyOwnPosts] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [postIdTobeDeleted, setPostIdTobeDeleted] = useState("");
 
   const { currentUser, loading, error } = useSelector((state) => state.user);
+
   const fileRef = useRef();
   const dispatch = useDispatch();
   const handleImageChange = (e) => {
@@ -44,6 +53,24 @@ export default function DashProfile() {
     if (!file) return;
     uploadImage(file);
   }, [file]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch(`/api/post/getPosts?userId=${currentUser._id}`);
+        const data = await res.json();
+        if (!res.ok) {
+          return;
+        }
+        if (res.ok) {
+          setPosts(data.posts);
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    fetchPosts();
+  }, [currentUser._id]);
 
   const uploadImage = async (file) => {
     try {
@@ -145,7 +172,7 @@ export default function DashProfile() {
   };
 
   const handleDeleteUser = async () => {
-    setShowModal(false);
+    setShowModalForDeleteUser(false);
     try {
       const res = await fetch(`/api/user/deleteUser/${currentUser._id}`, {
         method: "DELETE",
@@ -177,6 +204,26 @@ export default function DashProfile() {
     }
   };
 
+  const handleDeletePost = async () => {
+    try {
+      setShowModalForDeletePost(false);
+      const res = await fetch(`/api/post/deletePost/${postIdTobeDeleted}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return;
+      }
+      if (res.ok) {
+        setPosts((prev) =>
+          prev.filter((post) => post._id !== postIdTobeDeleted)
+        );
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   // className="min-h-screen w-full bg-cover"
   // style={{
   //   backgroundImage: "url('/bg-signup.png')",
@@ -193,10 +240,10 @@ export default function DashProfile() {
         backgroundBlendMode: "lighten", // blend white with image
       }}
     >
-      <div className="w-full max-w-lg mx-auto p-3">
+      <div className="w-full mx-auto p-3">
         <h1 className="text-3xl text-center font-semibold my-7">Profile</h1>
         <form
-          className="flex flex-col gap-4 shadow-md rounded-xl px-4 py-8 bg-white z-30"
+          className="w-full max-w-lg mx-auto flex flex-col gap-4 shadow-md rounded-xl px-4 py-8 bg-white z-30"
           onSubmit={handleSubmit}
         >
           <div className="relative w-32 h-32 self-center rounded-full cursor-pointer overflow-hidden shadow-md">
@@ -231,6 +278,7 @@ export default function DashProfile() {
               onClick={() => fileRef.current.click()}
             />
           </div>
+            <span className="bg-slate-700 w-fit px-2 py-1 text-xs rounded-lg text-white font-semibold mx-auto">{currentUser.role}</span>
           <input
             hidden
             type="file"
@@ -284,24 +332,66 @@ export default function DashProfile() {
             )}
           </Button>
           <div className="text-sm text-red-600 flex items-center justify-between mt-4">
-            <span className="cursor-pointer" onClick={() => setShowModal(true)}>
+            <span
+              className="cursor-pointer"
+              onClick={() => setShowModalForDeleteUser(true)}
+            >
               Delete account
             </span>
             <span className="cursor-pointer" onClick={handleSignOut}>
               Sign out
             </span>
           </div>
+          {(error || imageUploadingError) && (
+            <Alert color="failure">{error || imageUploadingError}</Alert>
+          )}
         </form>
-        {(error || imageUploadingError) && (
-          <Alert color="failure" className="mt-5">
-            {error || imageUploadingError}
-          </Alert>
-        )}
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="my-7 flex justify-center">
+            <ButtonGroup outline>
+              <Button
+                color="dark"
+                className="flex items-center"
+                onClick={() => {
+                  setShowMyOwnPosts((prev) => !prev);
+                }}
+              >
+                <MdOutlineArticle className="me-2 h-4 w-4" />
+                Show my own Posts
+              </Button>
+              <Button color="dark">
+                <Link to={"/create-post"} className="flex items-center">
+                  <MdPostAdd className="me-2 h-4 w-4" />
+                  Create Post
+                </Link>
+              </Button>
+            </ButtonGroup>
+          </div>
+
+          {showMyOwnPosts && posts && posts.length > 0 && (
+            <div className="flex flex-wrap gap-3">
+              {posts.map((post) => (
+                <div className="">
+                  <PostCard
+                    key={post._id}
+                    post={{
+                      ...post,
+                      onDelete: (id) => {
+                        setPostIdTobeDeleted(id);
+                        setShowModalForDeletePost(true);
+                      },
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         <Modal
-          show={showModal}
+          show={showModalForDeleteUser}
           popup
           size="md"
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowModalForDeleteUser(false)}
         >
           <ModalHeader />
           <ModalBody className="flex flex-col items-center gap-4">
@@ -320,7 +410,40 @@ export default function DashProfile() {
               <Button
                 color="alternative"
                 className="cursor-pointer"
-                onClick={() => setShowModal(false)}
+                onClick={() => setShowModalForDeleteUser(false)}
+              >
+                No, Cancel
+              </Button>
+            </div>
+          </ModalBody>
+        </Modal>
+        <Modal
+          show={showModalForDeletePost}
+          popup
+          size="md"
+          onClose={() => setShowModalForDeletePost(false)}
+        >
+          <ModalHeader />
+          <ModalBody className="flex flex-col items-center gap-4">
+            <HiOutlineExclamationCircle className="w-16 h-16 text-gray-400" />
+            <p className="font-medium text-gray-500">
+              Are you sure you want to delete this post?
+            </p>
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                color="red"
+                className="cursor-pointer"
+                onClick={() => {
+                  setShowModalForDeletePost(false);
+                  handleDeletePost(postIdTobeDeleted);
+                }}
+              >
+                Yes, I'm sure
+              </Button>
+              <Button
+                color="alternative"
+                className="cursor-pointer"
+                onClick={() => setShowModalForDeletePost(false)}
               >
                 No, Cancel
               </Button>

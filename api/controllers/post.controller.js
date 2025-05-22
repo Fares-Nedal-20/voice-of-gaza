@@ -170,6 +170,7 @@ export const getPosts = async (req, res, next) => {
     searchTerm: Joi.string().min(1),
   }).unknown(true);
   try {
+    // Check if the queries in request from the client side is apply the rules that i put them in Joi Package
     const { value: validatedQuery, error } = querySchema.validate(req.query);
     if (error) {
       return next(errorHandler(400, error.details[0].message));
@@ -223,12 +224,11 @@ export const getPosts = async (req, res, next) => {
 
     const query = {};
 
-    if (req.query.postId) query._id = postId;
-    if (req.query.authorId) query.authorId = authorId;
-    if (req.query.slug) query.slug = { $regex: slug, $options: "i" };
-    if (req.query.category)
-      query.category = { $regex: category, $options: "i" };
-    if (req.query.searchTerm) {
+    if (postId) query._id = postId;
+    if (authorId) query.authorId = authorId;
+    if (slug) query.slug = { $regex: slug, $options: "i" };
+    if (category) query.category = { $regex: category, $options: "i" };
+    if (searchTerm) {
       query.$or = [
         { title: { $regex: searchTerm, $options: "i" } },
         { content: { $regex: searchTerm, $options: "i" } },
@@ -261,7 +261,7 @@ export const getPosts = async (req, res, next) => {
 };
 
 export const deletePost = async (req, res, next) => {
-  if (req.user.role !== "admin") {
+  if (req.user.role !== "admin" && req.user.role !== "writer") {
     return next(errorHandler(401, "You are not allowed to delete this post!"));
   }
   try {
