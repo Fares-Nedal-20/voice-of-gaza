@@ -36,6 +36,7 @@ export default function DashProfile() {
   const [showMyOwnPosts, setShowMyOwnPosts] = useState(false);
   const [posts, setPosts] = useState([]);
   const [postIdTobeDeleted, setPostIdTobeDeleted] = useState("");
+  const [showMore, setShowMore] = useState(false);
 
   const { currentUser, loading, error } = useSelector((state) => state.user);
 
@@ -60,10 +61,16 @@ export default function DashProfile() {
         const res = await fetch(`/api/post/getPosts?userId=${currentUser._id}`);
         const data = await res.json();
         if (!res.ok) {
+          setShowMore(false);
           return;
         }
         if (res.ok) {
           setPosts(data.posts);
+          if (data.posts.length < 9) {
+            setShowMore(false);
+          } else {
+            setShowMore(true);
+          }
         }
       } catch (error) {
         console.log(error.message);
@@ -224,6 +231,25 @@ export default function DashProfile() {
     }
   };
 
+  const handleShowMore = async () => {
+    try {
+      const startIndex = posts.length;
+      const res = await fetch(`/api/post/getPosts?startIndex=${startIndex}`);
+      const data = await res.json();
+      if (!res.ok) return;
+      if (res.ok) {
+        setPosts([...posts, ...data.posts]);
+        if (data.posts.length < 9) {
+          setShowMore(false);
+        } else {
+          setShowMore(true);
+        }
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   // className="min-h-screen w-full bg-cover"
   // style={{
   //   backgroundImage: "url('/bg-signup.png')",
@@ -278,7 +304,9 @@ export default function DashProfile() {
               onClick={() => fileRef.current.click()}
             />
           </div>
-            <span className="bg-slate-700 w-fit px-2 py-1 text-xs rounded-lg text-white font-semibold mx-auto">{currentUser.role}</span>
+          <span className="bg-slate-700 w-fit px-2 py-1 text-xs rounded-lg text-white font-semibold mx-auto">
+            {currentUser.role}
+          </span>
           <input
             hidden
             type="file"
@@ -369,7 +397,7 @@ export default function DashProfile() {
           </div>
 
           {showMyOwnPosts && posts && posts.length > 0 && (
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 justify-center">
               {posts.map((post) => (
                 <div className="">
                   <PostCard
@@ -385,6 +413,14 @@ export default function DashProfile() {
                 </div>
               ))}
             </div>
+          )}
+          {showMyOwnPosts && showMore && (
+            <p
+              onClick={handleShowMore}
+              className="my-7 text-teal-500 hover:underline text-sm hover:cursor-pointer px-3 text-center"
+            >
+              Show More
+            </p>
           )}
         </div>
         <Modal

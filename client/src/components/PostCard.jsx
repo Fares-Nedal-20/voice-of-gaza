@@ -5,7 +5,7 @@ import { FiEdit } from "react-icons/fi";
 
 export default function PostCard({ post }) {
   return (
-    <div className="bg-gray-300 group relative w-full border border-gray-500 hover:border-2 h-[370px] overflow-hidden rounded-lg sm:w-[380px] transition-all mx-auto">
+    <div className="bg-gray-300 group relative w-[462px] border border-gray-500 hover:border-2 h-[370px] overflow-hidden rounded-lg sm:w-[350px] transition-all mx-auto">
       <Link to={`/post/${post.slug}`}>
         <img
           src={post.image}
@@ -24,7 +24,7 @@ export default function PostCard({ post }) {
         <div className="z-10 group-hover:bottom-0 absolute bottom-[-200px] left-0 right-0 flex justify-between items-center">
           <Link
             to={`/post/${post.slug}`}
-            className="flex-3 border border-gray-500 text-gray-800 hover:bg-gray-500 hover:text-white transition-all duration-300 text-center py-2 rounded-md !rounded-tl-none m-2"
+            className="flex-3 border border-gray-500 text-gray-800 hover:bg-gray-600 hover:text-white transition-all duration-300 text-center py-2 rounded-md !rounded-tl-none m-2"
           >
             Read article
           </Link>
