@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 import { MdClose } from "react-icons/md";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 export default function UpdatePost() {
   const [formData, setFormData] = useState(null);
@@ -244,7 +246,18 @@ export default function UpdatePost() {
               />
             </div>
           )}
-          <Textarea
+          <ReactQuill
+            theme="snow"
+            placeholder="Write Something..."
+            required
+            id="content"
+            value={formData?.content || ""}
+            className="h-72 mb-12"
+            onChange={(value) => {
+              setFormData({ ...formData, content: value });
+            }}
+          />
+          {/* <Textarea
             value={formData?.content || ""}
             onChange={(e) =>
               setFormData({ ...formData, content: e.target.value })
@@ -252,7 +265,7 @@ export default function UpdatePost() {
             id="content"
             placeholder="Type here..."
             rows={4}
-          />
+          /> */}
           <Button
             disabled={isUploadingImage || loading}
             type="submit"

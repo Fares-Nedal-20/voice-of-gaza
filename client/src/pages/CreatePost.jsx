@@ -9,6 +9,8 @@ import {
 } from "flowbite-react";
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 export default function CreatePost() {
   const [formData, setFormData] = useState(null);
@@ -220,21 +222,39 @@ export default function CreatePost() {
               />
             </div>
           )}
-          <Textarea
+          <ReactQuill
+            theme="snow"
+            placeholder="Write Something..."
+            required
+            id="content"
+            className="h-72 mb-12"
+            onChange={(value) => {
+              setFormData({ ...formData, content: value });
+            }}
+          />
+          {/* <Textarea
             onChange={(e) =>
               setFormData({ ...formData, content: e.target.value })
             }
             id="content"
             placeholder="Type here..."
             rows={4}
-          />
-          <Button disabled={isUploadingImage || loading} type="submit" className="cursor-pointer" outline color="gray">
+          /> */}
+          <Button
+            disabled={isUploadingImage || loading}
+            type="submit"
+            className="cursor-pointer"
+            outline
+            color="gray"
+          >
             {loading ? (
               <div className="flex gap-1 items-center">
-                <Spinner size="sm"/>
+                <Spinner size="sm" />
                 <span>Loading...</span>
               </div>
-            ) : ("Publish")}
+            ) : (
+              "Publish"
+            )}
           </Button>
           {(imageUploadError || error) && (
             <Alert color="failure">{imageUploadError || error}</Alert>

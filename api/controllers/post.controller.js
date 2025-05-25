@@ -265,7 +265,7 @@ export const deletePost = async (req, res, next) => {
     return next(errorHandler(401, "You are not allowed to delete this post!"));
   }
   try {
-    await Post.findOneAndDelete(req.params.postId);
+    await Post.findByIdAndDelete(req.params.postId);
     res.status(200).json("Post has been deleted!");
   } catch (error) {
     next(error);

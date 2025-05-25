@@ -18,9 +18,10 @@ export default function PostCard({ post }) {
           {post.title}
         </p>
         <span className="italic text-sm">{post.category}</span>
-        <p className="text-xs font-medium line-clamp-1 italic text-gray-600">
-          {post.content}
-        </p>
+        <p
+          dangerouslySetInnerHTML={{ __html: post.content }}
+          className="text-xs font-medium line-clamp-1 italic text-gray-600"
+        ></p>
         <div className="z-10 group-hover:bottom-0 absolute bottom-[-200px] left-0 right-0 flex justify-between items-center">
           <Link
             to={`/post/${post.slug}`}

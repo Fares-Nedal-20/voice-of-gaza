@@ -211,10 +211,10 @@ export default function DashProfile() {
     }
   };
 
-  const handleDeletePost = async () => {
+  const handleDeletePost = async (id) => {
     try {
       setShowModalForDeletePost(false);
-      const res = await fetch(`/api/post/deletePost/${postIdTobeDeleted}`, {
+      const res = await fetch(`/api/post/deletePost/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -223,7 +223,7 @@ export default function DashProfile() {
       }
       if (res.ok) {
         setPosts((prev) =>
-          prev.filter((post) => post._id !== postIdTobeDeleted)
+          prev.filter((post) => post._id !== id)
         );
       }
     } catch (error) {
@@ -399,7 +399,7 @@ export default function DashProfile() {
           {showMyOwnPosts && posts && posts.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-center">
               {posts.map((post) => (
-                <div className="">
+                <div>
                   <PostCard
                     key={post._id}
                     post={{
