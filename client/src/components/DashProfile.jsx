@@ -37,6 +37,8 @@ export default function DashProfile() {
   const [posts, setPosts] = useState([]);
   const [postIdTobeDeleted, setPostIdTobeDeleted] = useState("");
   const [showMore, setShowMore] = useState(false);
+  const [errorThatRelatedToShowPosts, setErrorThatRelatedToShowPosts] =
+    useState(null);
 
   const { currentUser, loading, error } = useSelector((state) => state.user);
 
@@ -62,6 +64,7 @@ export default function DashProfile() {
         const data = await res.json();
         if (!res.ok) {
           setShowMore(false);
+          setErrorThatRelatedToShowPosts(data.message);
           return;
         }
         if (res.ok) {
@@ -73,7 +76,7 @@ export default function DashProfile() {
           }
         }
       } catch (error) {
-        console.log(error.message);
+        setErrorThatRelatedToShowPosts(error.message);
       }
     };
     fetchPosts();
@@ -219,15 +222,14 @@ export default function DashProfile() {
       });
       const data = await res.json();
       if (!res.ok) {
+        setErrorThatRelatedToShowPosts(data.message);
         return;
       }
       if (res.ok) {
-        setPosts((prev) =>
-          prev.filter((post) => post._id !== id)
-        );
+        setPosts((prev) => prev.filter((post) => post._id !== id));
       }
     } catch (error) {
-      console.log(error.message);
+      setErrorThatRelatedToShowPosts(error.message);
     }
   };
 
@@ -236,7 +238,10 @@ export default function DashProfile() {
       const startIndex = posts.length;
       const res = await fetch(`/api/post/getPosts?startIndex=${startIndex}`);
       const data = await res.json();
-      if (!res.ok) return;
+      if (!res.ok) {
+        setErrorThatRelatedToShowPosts(data.message);
+        return;
+      }
       if (res.ok) {
         setPosts([...posts, ...data.posts]);
         if (data.posts.length < 9) {
@@ -246,9 +251,16 @@ export default function DashProfile() {
         }
       }
     } catch (error) {
-      console.log(error.message);
+      setErrorThatRelatedToShowPosts(error.message);
     }
   };
+
+  useEffect(() => {
+    if (error || errorThatRelatedToShowPosts || imageUploadingError) {
+      setShowMyOwnPosts(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [error, errorThatRelatedToShowPosts, imageUploadingError]);
 
   // className="min-h-screen w-full bg-cover"
   // style={{
@@ -370,8 +382,10 @@ export default function DashProfile() {
               Sign out
             </span>
           </div>
-          {(error || imageUploadingError) && (
-            <Alert color="failure">{error || imageUploadingError}</Alert>
+          {(error || imageUploadingError || errorThatRelatedToShowPosts) && (
+            <Alert color="failure">
+              {error || imageUploadingError || errorThatRelatedToShowPosts}
+            </Alert>
           )}
         </form>
         <div className="w-full max-w-7xl mx-auto">
@@ -399,9 +413,8 @@ export default function DashProfile() {
           {showMyOwnPosts && posts && posts.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-center">
               {posts.map((post) => (
-                <div>
+                <div key={post._id}>
                   <PostCard
-                    key={post._id}
                     post={{
                       ...post,
                       onDelete: (id) => {

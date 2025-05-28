@@ -5,7 +5,7 @@ import { FiEdit } from "react-icons/fi";
 
 export default function PostCard({ post }) {
   return (
-    <div className="bg-gray-300 group relative w-[462px] border border-gray-500 hover:border-2 h-[370px] overflow-hidden rounded-lg sm:w-[350px] transition-all mx-auto">
+    <div className="bg-gray-300 group relative h-[370px] w-[350px] border border-gray-500 hover:border-2 overflow-hidden rounded-lg transition-all mx-auto">
       <Link to={`/post/${post.slug}`}>
         <img
           src={post.image}
