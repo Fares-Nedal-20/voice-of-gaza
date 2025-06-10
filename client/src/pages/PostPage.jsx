@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import CommentSection from "../components/CommentSection";
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -55,6 +56,7 @@ export default function PostPage() {
         className="post-content w-full max-w-4xl mx-auto"
         dangerouslySetInnerHTML={{ __html: post.content }}
       ></div>
+      <CommentSection post={post} />
     </div>
   );
 }

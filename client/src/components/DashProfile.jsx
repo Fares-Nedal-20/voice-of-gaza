@@ -60,7 +60,9 @@ export default function DashProfile() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch(`/api/post/getPosts?userId=${currentUser._id}`);
+        const res = await fetch(
+          `/api/post/getPosts?authorId=${currentUser._id}`
+        );
         const data = await res.json();
         if (!res.ok) {
           setShowMore(false);
@@ -389,26 +391,30 @@ export default function DashProfile() {
           )}
         </form>
         <div className="w-full max-w-7xl mx-auto">
-          <div className="my-7 flex justify-center">
-            <ButtonGroup outline>
-              <Button
-                color="dark"
-                className="flex items-center"
-                onClick={() => {
-                  setShowMyOwnPosts((prev) => !prev);
-                }}
-              >
-                <MdOutlineArticle className="me-2 h-4 w-4" />
-                Show my own Posts
-              </Button>
-              <Button color="dark">
-                <Link to={"/create-post"} className="flex items-center">
-                  <MdPostAdd className="me-2 h-4 w-4" />
-                  Create Post
-                </Link>
-              </Button>
-            </ButtonGroup>
-          </div>
+          {currentUser?.role === "writer" && (
+            <div className="my-7 flex justify-center">
+              <ButtonGroup outline>
+                {posts.length > 0 && (
+                  <Button
+                    color="dark"
+                    className="flex items-center"
+                    onClick={() => {
+                      setShowMyOwnPosts((prev) => !prev);
+                    }}
+                  >
+                    <MdOutlineArticle className="me-2 h-4 w-4" />
+                    Show my own Posts
+                  </Button>
+                )}
+                <Button color="dark">
+                  <Link to={"/create-post"} className="flex items-center">
+                    <MdPostAdd className="me-2 h-4 w-4" />
+                    Create Post
+                  </Link>
+                </Button>
+              </ButtonGroup>
+            </div>
+          )}
 
           {showMyOwnPosts && posts && posts.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-center">
