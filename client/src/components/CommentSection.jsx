@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Textarea, Button, Alert, Spinner } from "flowbite-react";
 import { Link } from "react-router-dom";
+import Comment from "./Comment";
 
 export default function CommentSection({ post }) {
   const { currentUser } = useSelector((state) => state.user);
@@ -9,6 +10,7 @@ export default function CommentSection({ post }) {
   const [errorCommentSection, setErrorCommentSection] = useState(null);
   const [successCommentSubmit, setSuccessCommentSubmit] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [commentInfo, setCommentInfo] = useState(null);
 
   const handleClickSubmitComment = async () => {
     try {
@@ -30,8 +32,9 @@ export default function CommentSection({ post }) {
         return;
       }
       if (res.ok) {
-        setSuccessCommentSubmit("Comment created successfully!");
         setLoading(false);
+        setCommentInfo(data);
+        setSuccessCommentSubmit("Comment created successfully!");
       }
     } catch (error) {
       setErrorCommentSection(error.message);
@@ -67,7 +70,11 @@ export default function CommentSection({ post }) {
           <span className="text-xs">
             {1000 - (formData.content?.length || 0)} characters remaining
           </span>
-          <Button disabled={loading} onClick={handleClickSubmitComment}>
+          <Button
+            size="sm"
+            disabled={loading}
+            onClick={handleClickSubmitComment}
+          >
             {loading ? (
               <div className="flex gap-1 items-center">
                 <Spinner size="sm" />
@@ -85,6 +92,13 @@ export default function CommentSection({ post }) {
       {successCommentSubmit && (
         <Alert color="success">{successCommentSubmit}</Alert>
       )}
+      <div className="flex gap-1 items-center text-gray-700">
+        <span>Comments</span>
+        <span className="px-2 border border-gray-700">
+          {commentInfo?.commentsCount}
+        </span>
+      </div>
+      <Comment comment={commentInfo?.comment} />
     </div>
   );
 }
