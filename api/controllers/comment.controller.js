@@ -1,3 +1,4 @@
+import Joi from "joi";
 import Comment from "../models/comment.model.js";
 import { errorHandler } from "../utils/error.js";
 import Post from "./../models/post.model.js";
@@ -82,6 +83,64 @@ export const createComment = async (req, res, next) => {
       message: "Comment created successfully",
       comment: newComment,
       commentsCount: updatedPost.commentsCount, // number of comments in a spesific post
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getComments = async (req, res, next) => {
+  if (req.user.role !== "admin" && req.user.role !== "writer") {
+    return next(errorHandler(401, "You are not allowed to show comments!"));
+  }
+  const querySchema = Joi.object({
+    startIndex: Joi.number().integer().min(0).default(0),
+    limit: Joi.number().integer().min(1).max(18).default(3),
+    sort: Joi.string().valid("asc", "desc").default("desc"),
+
+    commentId: Joi.string().hex().length(24),
+    postId: Joi.string().hex().length(24),
+    userId: Joi.string().hex().length(24),
+    content: Joi.string().min(1).max(50),
+  });
+
+  try {
+    const { value: validatedQuery, error } = querySchema.validate(req.query);
+    console.log(validatedQuery);
+    if (error) {
+      return next(errorHandler(400, error.details[0].message));
+    }
+
+    const { startIndex, limit, sort, commentId, postId, userId, content } =
+      validatedQuery;
+
+    const sortDirection = sort === "asc" ? 1 : -1;
+
+    const query = {};
+
+    if (commentId) query._id = commentId;
+    if (postId) query.postId = postId;
+    if (userId) query.userId = userId;
+    if (content) query.content = { $regex: content, $options: "i" };
+
+    const now = new Date();
+    const oneMonthAgo = new Date(now);
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+
+    const [comments, totalComments, lastComments] = await Promise.all([
+      Comment.find(query)
+        .sort({ updatedAt: sortDirection })
+        .skip(startIndex)
+        .limit(limit)
+        .populate("userId", "username email profilePicture"),
+      Comment.countDocuments(query),
+      Comment.countDocuments({ createdAt: { $gte: oneMonthAgo } }),
+    ]);
+
+    res.status(200).json({
+      comments,
+      totalComments,
+      lastComments,
     });
   } catch (error) {
     next(error);

@@ -239,13 +239,15 @@ export default function DashPosts() {
                     {new Date(post.updatedAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    {post.image && (
-                      <img
-                        className="w-14 h-10 object-cover rounded-sm bg-gray-300"
-                        src={post.image}
-                        alt={post.title}
-                      />
-                    )}
+                    <Link to={`/post/${post.slug}`}>
+                      {post.image && (
+                        <img
+                          className="w-14 h-10 object-cover rounded-sm bg-gray-300"
+                          src={post.image}
+                          alt={post.title}
+                        />
+                      )}
+                    </Link>
                   </TableCell>
                   <TableCell>
                     {authors[post.authorId]?.username || "Loading..."}
