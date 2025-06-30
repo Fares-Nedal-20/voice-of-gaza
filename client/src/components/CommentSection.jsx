@@ -15,8 +15,6 @@ export default function CommentSection({ post }) {
   const [comments, setComments] = useState([]);
   const [totalComments, setTotalComments] = useState(0);
 
-  console.log(comments, totalComments);
-
   const fetchComments = async () => {
     try {
       const res = await fetch(`/api/comment/getComments?postId=${post?._id}`);
@@ -51,6 +49,7 @@ export default function CommentSection({ post }) {
       if (res.ok) {
         setLoading(false);
         setSuccessCommentSubmit("Comment created successfully!");
+        setFormData({ content: "" });
         fetchComments();
       }
     } catch (error) {

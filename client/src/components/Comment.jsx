@@ -4,13 +4,12 @@ import moment from "moment";
 export default function Comment({ comments = [] }) {
   // { comments = [] } ==>> to ensure that comments is always an array, even if it's empty
 
-  console.log(comments);
   return (
-    <div className="flex flex-col gap-4 max-w-2xl overflow-hidden">
+    <div className="flex flex-col gap-4 max-w-2xl break-words">
       {comments.map((comment) => (
         <div className="flex gap-4" key={comment._id}>
           {/* left side (for image) */}
-          <div>
+          <div className="flex shrink-0">
             <img
               src={comment?.userId?.profilePicture}
               alt="https://svgsilh.com/svg_v2/659651.svg"
