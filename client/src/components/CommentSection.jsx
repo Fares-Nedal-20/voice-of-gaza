@@ -25,13 +25,20 @@ export default function CommentSection({ post }) {
   const [commentIdToBeDeleted, setCommentIdToBeDeleted] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [deleteCommentError, setDeleteCommentError] = useState(false);
+  const [showMore, setShowMore] = useState(true);
 
   const fetchComments = async () => {
     try {
+      setShowMore(true)
       const res = await fetch(`/api/comment/getComments?postId=${post?._id}`);
       const data = await res.json();
       setComments(data.comments);
       setTotalComments(data.totalComments);
+      if (comments.length < data.totalComments) {
+        setShowMore(true);
+      } else {
+        setShowMore(false);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -100,6 +107,28 @@ export default function CommentSection({ post }) {
     }
   };
 
+  const handleShowMore = async () => {
+    const startIndex = comments.length;
+    try {
+      const res = await fetch(
+        `/api/comment/getComments?startIndex=${startIndex}&postId=${post._id}`
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setShowMore(false);
+        return;
+      }
+      if (res.ok) {
+        setComments((prev) => setComments([...prev, ...data.comments]));
+        if (comments.length === data.totalComments - 1) {
+          setShowMore(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col gap-4 mt-[-50px]">
       {currentUser ? (
@@ -117,7 +146,7 @@ export default function CommentSection({ post }) {
               </span>
             </Link>
           </div>
-          <div className="flex flex-col gap-4 border border-1 p-3 rounded-lg border-teal-500">
+          <div className="flex flex-col gap-4 border-1 p-3 rounded-lg border-teal-500">
             <Textarea
               placeholder="Add a comment..."
               className="text-sm"
@@ -168,6 +197,14 @@ export default function CommentSection({ post }) {
               setCommentIdToBeDeleted(commentId);
             }}
           />
+          {showMore && (
+            <p
+              onClick={handleShowMore}
+              className="text-sm text-teal-500 hover:underline cursor-pointer ml-11"
+            >
+              Show more comments
+            </p>
+          )}
         </>
       ) : (
         <Link to={"/sign-in"} className="w-fit">
