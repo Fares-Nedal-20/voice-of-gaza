@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { Textarea, Button, Alert, Spinner } from "flowbite-react";
+import {
+  Textarea,
+  Button,
+  Alert,
+  Spinner,
+  Modal,
+  ModalHeader,
+  ModalBody,
+} from "flowbite-react";
 import { Link } from "react-router-dom";
 import Comment from "./Comment";
 import { useEffect } from "react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 export default function CommentSection({ post }) {
-  console.log(post);
   const { currentUser } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
   const [errorCommentSection, setErrorCommentSection] = useState(null);
@@ -14,6 +22,9 @@ export default function CommentSection({ post }) {
   const [loading, setLoading] = useState(false);
   const [comments, setComments] = useState([]);
   const [totalComments, setTotalComments] = useState(0);
+  const [commentIdToBeDeleted, setCommentIdToBeDeleted] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [deleteCommentError, setDeleteCommentError] = useState(false);
 
   const fetchComments = async () => {
     try {
@@ -61,6 +72,33 @@ export default function CommentSection({ post }) {
   useEffect(() => {
     fetchComments();
   }, [post._id]);
+
+  const handleDelete = async () => {
+    setShowModal(false);
+    setErrorCommentSection(false);
+    setSuccessCommentSubmit(false);
+    try {
+      const res = await fetch(
+        `/api/comment/deleteComment/${commentIdToBeDeleted}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setDeleteCommentError(data.message);
+        return;
+      }
+      if (res.ok) {
+        setComments((prev) =>
+          prev.filter((comment) => comment._id !== commentIdToBeDeleted)
+        );
+        fetchComments();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col gap-4 mt-[-50px]">
@@ -114,13 +152,22 @@ export default function CommentSection({ post }) {
           {successCommentSubmit && (
             <Alert color="success">{successCommentSubmit}</Alert>
           )}
+          {deleteCommentError && (
+            <Alert color="failure">{deleteCommentError}</Alert>
+          )}
           <div className="flex gap-1 items-center text-gray-700">
             <span>Comments</span>
             <span className="px-1 border border-gray-700 rounded-xs">
               {totalComments}
             </span>
           </div>
-          <Comment comments={comments} />
+          <Comment
+            comments={comments}
+            onDelete={(commentId) => {
+              setShowModal(true);
+              setCommentIdToBeDeleted(commentId);
+            }}
+          />
         </>
       ) : (
         <Link to={"/sign-in"} className="w-fit">
@@ -129,6 +176,38 @@ export default function CommentSection({ post }) {
           </p>
         </Link>
       )}
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        size="md"
+        popup
+      >
+        <ModalHeader />
+        <ModalBody className="flex flex-col gap-6 items-center">
+          <HiOutlineExclamationCircle className="w-16 h-16 text-gray-400" />
+          <p className="font-medium text-gray-500">
+            Are you sure you want to delete this comment?
+          </p>
+          <div className="flex justify-center items-center gap-4">
+            <Button
+              color={"red"}
+              className="cursor-pointer"
+              onClick={handleDelete}
+            >
+              Yes, I'm sure
+            </Button>
+            <Button
+              color={"alternative"}
+              className="cursor-pointer"
+              onClick={() => {
+                setShowModal(false);
+              }}
+            >
+              Yes, I'm sure
+            </Button>
+          </div>
+        </ModalBody>
+      </Modal>
     </div>
   );
 }

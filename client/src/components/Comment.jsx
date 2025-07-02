@@ -1,7 +1,7 @@
 import { FaThumbsUp } from "react-icons/fa";
 import moment from "moment";
 
-export default function Comment({ comments = [] }) {
+export default function Comment({ comments = [], onDelete }) {
   // { comments = [] } ==>> to ensure that comments is always an array, even if it's empty
 
   return (
@@ -33,7 +33,10 @@ export default function Comment({ comments = [] }) {
               <span className="hover:underline cursor-pointer hover:text-green-500">
                 Edit
               </span>
-              <span className="hover:underline cursor-pointer hover:text-red-500">
+              <span
+                className="hover:underline cursor-pointer hover:text-red-500"
+                onClick={() => onDelete(comment._id)}
+              >
                 Delete
               </span>
             </div>
