@@ -14,6 +14,6 @@ router.post("/createComment/:postId", verifyToken, createComment);
 router.get("/getComments", verifyToken, getComments);
 router.delete("/deleteComment/:commentId", verifyToken, deleteComments);
 router.put("/updateComment/:userId/:commentId", verifyToken, updateComment);
-router.put("/likeComment/:userId/:commentId", verifyToken, likeComment);
+router.get("/likeComment/:userId/:commentId", verifyToken, likeComment);
 
 export default router;

@@ -26,6 +26,7 @@ export default function CommentSection({ post }) {
   const [showModal, setShowModal] = useState(false);
   const [deleteCommentError, setDeleteCommentError] = useState(false);
   const [showMore, setShowMore] = useState(true);
+  const [likeError, setLikeError] = useState(null);
 
   const fetchComments = async () => {
     try {
@@ -34,7 +35,7 @@ export default function CommentSection({ post }) {
       const data = await res.json();
       setComments(data.comments);
       setTotalComments(data.totalComments);
-      if (data.comments.length < data.totalComments) {
+      if (data.comments?.length < data.totalComments) {
         setShowMore(true);
       } else {
         setShowMore(false);
@@ -119,8 +120,8 @@ export default function CommentSection({ post }) {
         return;
       }
       if (res.ok) {
-        setComments((prev) => setComments([...prev, ...data.comments]));
-        if (comments.length === data.totalComments) {
+        setComments((prev) => [...prev, ...data.comments]);
+        if (comments?.length + data.comments?.length === data.totalComments) {
           setShowMore(false);
         }
       }
@@ -135,6 +136,42 @@ export default function CommentSection({ post }) {
         c._id === comment._id ? { ...c, content: editedContent } : c
       )
     );
+  };
+
+  const handleLike = async (commentId) => {
+    try {
+      const res = await fetch(
+        `/api/comment/likeComment/${currentUser._id}/${commentId}`
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setLikeError(data.message);
+        return;
+      }
+      if (res.ok) {
+        setComments(
+          comments.map((comment) => {
+            if (comment._id === commentId) {
+              const alreadyLiked = comment.likes.includes(currentUser._id);
+              let updatedLikes;
+              if (alreadyLiked) {
+                // Remove user from likes
+                updatedLikes = comment.likes.filter(
+                  (id) => id !== currentUser._id
+                );
+              } else {
+                updatedLikes = [...comment.likes, currentUser._id];
+              }
+
+              return { ...comment, likes: updatedLikes };
+            }
+            return comment;
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -192,6 +229,8 @@ export default function CommentSection({ post }) {
           {deleteCommentError && (
             <Alert color="failure">{deleteCommentError}</Alert>
           )}
+          {likeError && <Alert color="failure">{likeError}</Alert>}
+
           <div className="flex gap-1 items-center text-gray-700">
             <span>Comments</span>
             <span className="px-1 border border-gray-700 rounded-xs">
@@ -207,6 +246,7 @@ export default function CommentSection({ post }) {
                 setCommentIdToBeDeleted(commentId);
               }}
               onEdit={handleEdit}
+              onLike={handleLike}
             />
           ))}
           {comments?.length > 0 && showMore && (

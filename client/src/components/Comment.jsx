@@ -3,13 +3,22 @@ import moment from "moment";
 import { useState } from "react";
 import { Button, Textarea } from "flowbite-react";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
-export default function Comment({ comment, onDelete, onEdit }) {
+export default function Comment({ comment, onDelete, onEdit, onLike }) {
   // { comments = [] } ==>> to ensure that comments is always an array, even if it's empty
 
   const { currentUser } = useSelector((state) => state.user);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState("");
+
+  const [likedByUser, setLikedByUser] = useState(false);
+  const [likeCount, setLikeCount] = useState(comment.likes.length);
+
+  useEffect(() => {
+    setLikedByUser(comment.likes.includes(currentUser._id));
+    setLikeCount(comment.likes.length);
+  }, [comment, currentUser._id]);
 
   const handleSave = async () => {
     try {
@@ -35,6 +44,22 @@ export default function Comment({ comment, onDelete, onEdit }) {
     }
   };
 
+  const handleLikeComment = async () => {
+    try {
+      await onLike(comment._id);
+
+      if (likedByUser) {
+        setLikeCount((prev) => prev - 1);
+      } else {
+        setLikeCount((prev) => prev + 1);
+      }
+
+      setLikedByUser((prev) => !prev);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 max-w-2xl break-words">
       <div className="flex gap-4">
@@ -55,6 +80,7 @@ export default function Comment({ comment, onDelete, onEdit }) {
             <span className="text-gray-500 text-xs font-medium italic">
               {moment(comment?.createdAt).fromNow()}
             </span>
+            {comment.isEdited && (<span className="text-xs italic underline text-gray-400">Edited</span>)}
           </div>
           {isEditing ? (
             <div className="flex flex-col gap-2 bg-gray-50 p-2 rounded-md shadow-md">
@@ -90,7 +116,17 @@ export default function Comment({ comment, onDelete, onEdit }) {
               <p className="text-sm text-gray-700 mb-2">{comment?.content}</p>
               <hr className="max-w-32" />
               <div className="flex items-center text-xs gap-2 text-gray-500">
-                <FaThumbsUp className="hover:text-blue-500 cursor-pointer" />
+                <div
+                  onClick={handleLikeComment}
+                  className="flex items-center gap-1 cursor-pointer hover:text-blue-500"
+                >
+                  <FaThumbsUp className={likedByUser ? "text-blue-500" : ""} />
+                  {likeCount > 0 && (
+                    <span>
+                      {likeCount} {likeCount > 0 ? "likes" : "like"}
+                    </span>
+                  )}
+                </div>
                 {(comment.userId._id === currentUser._id ||
                   currentUser.role === "admin") && (
                   <>

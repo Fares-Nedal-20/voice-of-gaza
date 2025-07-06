@@ -130,7 +130,7 @@ export const getComments = async (req, res, next) => {
 
     const [comments, totalComments, lastComments] = await Promise.all([
       Comment.find(query)
-        .sort({ updatedAt: sortDirection })
+        .sort({ createdAt: sortDirection })
         .skip(startIndex)
         .limit(limit)
         .populate("userId", "username email profilePicture"),
