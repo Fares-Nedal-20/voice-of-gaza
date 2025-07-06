@@ -29,12 +29,12 @@ export default function CommentSection({ post }) {
 
   const fetchComments = async () => {
     try {
-      setShowMore(true)
+      setShowMore(true);
       const res = await fetch(`/api/comment/getComments?postId=${post?._id}`);
       const data = await res.json();
       setComments(data.comments);
       setTotalComments(data.totalComments);
-      if (comments.length < data.totalComments) {
+      if (data.comments.length < data.totalComments) {
         setShowMore(true);
       } else {
         setShowMore(false);
@@ -120,13 +120,21 @@ export default function CommentSection({ post }) {
       }
       if (res.ok) {
         setComments((prev) => setComments([...prev, ...data.comments]));
-        if (comments.length === data.totalComments - 1) {
+        if (comments.length === data.totalComments) {
           setShowMore(false);
         }
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleEdit = (comment, editedContent) => {
+    setComments(
+      comments.map((c) =>
+        c._id === comment._id ? { ...c, content: editedContent } : c
+      )
+    );
   };
 
   return (
@@ -190,14 +198,18 @@ export default function CommentSection({ post }) {
               {totalComments}
             </span>
           </div>
-          <Comment
-            comments={comments}
-            onDelete={(commentId) => {
-              setShowModal(true);
-              setCommentIdToBeDeleted(commentId);
-            }}
-          />
-          {showMore && (
+          {comments?.map((comment) => (
+            <Comment
+              key={comment._id}
+              comment={comment}
+              onDelete={(commentId) => {
+                setShowModal(true);
+                setCommentIdToBeDeleted(commentId);
+              }}
+              onEdit={handleEdit}
+            />
+          ))}
+          {comments?.length > 0 && showMore && (
             <p
               onClick={handleShowMore}
               className="text-sm text-teal-500 hover:underline cursor-pointer ml-11"

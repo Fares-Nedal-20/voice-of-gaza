@@ -2,6 +2,7 @@ import Joi from "joi";
 import Comment from "../models/comment.model.js";
 import { errorHandler } from "../utils/error.js";
 import Post from "./../models/post.model.js";
+import mongoose from "mongoose";
 
 const bannedWords = [
   "kill",
@@ -162,6 +163,76 @@ export const deleteComments = async (req, res, next) => {
     await Comment.findByIdAndDelete(commentId);
 
     res.status(200).json("Comment is deleted successfuly!");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateComment = async (req, res, next) => {
+  if (req.user.id !== req.params.userId) {
+    return next(
+      errorHandler(401, "You are not allowed to update this comment!")
+    );
+  }
+  try {
+    const commentExist = await Comment.findById(req.params.commentId);
+    if (!commentExist) {
+      return next(errorHandler(404, "Comment not found!"));
+    }
+
+    const updatedComment = await Comment.findByIdAndUpdate(
+      req.params.commentId,
+      {
+        content: req.body.content,
+        isEdited: true,
+      },
+      {
+        new: true,
+      }
+    );
+
+    res.status(200).json({
+      message: "Comment is updated successfuly",
+      updatedComment,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const likeComment = async (req, res, next) => {
+  const { commentId, userId } = req.params;
+
+  if (req.user.id !== userId) {
+    return next(errorHandler(401, "You are not allowed to like this comment!"));
+  }
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return next(errorHandler(400, "CommentId is not valid!"));
+    }
+
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return next(errorHandler(404, "Comment not found!"));
+    }
+
+    const hasLiked = comment.likes.includes(userId);
+
+    if (hasLiked) {
+      comment.likes.pull(userId);
+    } else {
+      comment.likes.push(userId);
+    }
+
+    await comment.save();
+
+    res.status(200).json({
+      message: hasLiked ? "Comment unliked" : "Comment liked",
+      likeCount: comment.likes.length,
+      likedByUser: !hasLiked,
+    });
   } catch (error) {
     next(error);
   }
