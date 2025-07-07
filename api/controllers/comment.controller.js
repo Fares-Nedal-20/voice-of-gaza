@@ -96,14 +96,13 @@ export const getComments = async (req, res, next) => {
   }
   const querySchema = Joi.object({
     startIndex: Joi.number().integer().min(0).default(0),
-    limit: Joi.number().integer().min(1).max(18).default(3),
+    limit: Joi.number().integer().min(1).max(18).default(9),
     sort: Joi.string().valid("asc", "desc").default("desc"),
-
     commentId: Joi.string().hex().length(24),
     postId: Joi.string().hex().length(24),
     userId: Joi.string().hex().length(24),
-    content: Joi.string().min(1).max(50),
-  });
+    content: Joi.string().min(1).max(100),
+  }).unknown(true);;
 
   try {
     const { value: validatedQuery, error } = querySchema.validate(req.query);
@@ -130,7 +129,7 @@ export const getComments = async (req, res, next) => {
 
     const [comments, totalComments, lastComments] = await Promise.all([
       Comment.find(query)
-        .sort({ createdAt: sortDirection })
+        .sort({ updatedAt: sortDirection })
         .skip(startIndex)
         .limit(limit)
         .populate("userId", "username email profilePicture"),

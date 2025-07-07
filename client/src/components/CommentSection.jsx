@@ -31,7 +31,9 @@ export default function CommentSection({ post }) {
   const fetchComments = async () => {
     try {
       setShowMore(true);
-      const res = await fetch(`/api/comment/getComments?postId=${post?._id}`);
+      const res = await fetch(
+        `/api/comment/getComments?postId=${post?._id}&limit=3`
+      );
       const data = await res.json();
       setComments(data.comments);
       setTotalComments(data.totalComments);
@@ -112,7 +114,7 @@ export default function CommentSection({ post }) {
     const startIndex = comments.length;
     try {
       const res = await fetch(
-        `/api/comment/getComments?startIndex=${startIndex}&postId=${post._id}`
+        `/api/comment/getComments?startIndex=${startIndex}&postId=${post._id}&limit=3`
       );
       const data = await res.json();
       if (!res.ok) {
