@@ -6,7 +6,7 @@ import {
   SidebarLogo,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { HiLogout, HiUser, HiTable, HiLogin } from "react-icons/hi";
+import { HiLogout, HiUser, HiTable, HiLogin, HiChartPie } from "react-icons/hi";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signout } from "../redux/user/userSlice";
@@ -60,6 +60,9 @@ export default function DashSidebar() {
           </SidebarItem>
           {currentUser?.role === "admin" && (
             <>
+              <SidebarItem active={tab === "dash"} icon={HiChartPie} as={"div"}>
+                <Link to={"/dashboard?tab=dash"}>Dashboard</Link>
+              </SidebarItem>
               <SidebarItem active={tab === "users"} icon={FaUsers} as={"div"}>
                 <Link to={"/dashboard?tab=users"}>Users</Link>
               </SidebarItem>

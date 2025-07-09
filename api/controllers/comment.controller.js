@@ -127,7 +127,7 @@ export const getComments = async (req, res, next) => {
     const oneMonthAgo = new Date(now);
     oneMonthAgo.setMonth(now.getMonth() - 1);
 
-    const [comments, totalComments, lastComments] = await Promise.all([
+    const [comments, totalComments, lastMonthComments] = await Promise.all([
       Comment.find(query)
         .sort({ updatedAt: sortDirection })
         .skip(startIndex)
@@ -140,7 +140,7 @@ export const getComments = async (req, res, next) => {
     res.status(200).json({
       comments,
       totalComments,
-      lastComments,
+      lastMonthComments,
     });
   } catch (error) {
     next(error);
