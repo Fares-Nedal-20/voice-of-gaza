@@ -3,6 +3,10 @@
 @source "../.flowbite-react/class-list.json";
 @plugin 'tailwind-scrollbar';
 
+body {
+  background-color: #f2f4f6ec;
+}
+
 
 .post-content {
     font-family: 'Merriweather', serif;

@@ -11,7 +11,7 @@ import {
   DropdownItem,
   DropdownDivider,
 } from "flowbite-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
@@ -19,12 +19,23 @@ import { themeToggle } from "../redux/theme/themeSlice";
 import { CgProfile } from "react-icons/cg";
 import { HiLogout } from "react-icons/hi";
 import { signout } from "../redux/user/userSlice";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const path = useLocation().pathname;
   const { theme } = useSelector((state) => state.theme);
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const searchTermFromURL = urlParams.get("searchTerm");
+    if (searchTermFromURL) {
+      setSearchTerm(searchTermFromURL);
+    }
+  }, [location.search]);
 
   const handleSignOut = async () => {
     try {
@@ -41,6 +52,14 @@ export default function Header() {
     }
   };
 
+  const handleSubmitSearch = async (e) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("searchTerm", searchTerm);
+    const searchQuery = urlParams.toString();
+    navigate(`/search?${searchQuery}`);
+  };
+
   return (
     <Navbar className="border-b border-gray-300 shadow-md">
       <Link to={"/"}>
@@ -50,11 +69,15 @@ export default function Header() {
           className=" h-10 w-14 rounded-full object-contain"
         />
       </Link>
-      <form className="hidden md:inline">
+      <form onSubmit={handleSubmitSearch} className="hidden md:inline">
         <TextInput
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
           type="text"
           placeholder="Search..."
           rightIcon={AiOutlineSearch}
+          value={searchTerm}
         />
       </form>
       <Link to={"/search"}>
@@ -66,13 +89,18 @@ export default function Header() {
       <div className="flex gap-2 md:order-1">
         <Button pill color="light" onClick={() => dispatch(themeToggle())}>
           {theme === "light" ? <FaMoon /> : <FaSun />}
-        </Button >
+        </Button>
         {currentUser ? (
           <Dropdown
             arrowIcon={false}
             inline
             label={
-              <Avatar alt="user" img={currentUser.profilePicture} rounded className="cursor-pointer"/>
+              <Avatar
+                alt="user"
+                img={currentUser.profilePicture}
+                rounded
+                className="cursor-pointer"
+              />
             }
           >
             <DropdownHeader>

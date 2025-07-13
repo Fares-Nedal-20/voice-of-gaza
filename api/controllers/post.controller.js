@@ -167,11 +167,21 @@ export const getPosts = async (req, res, next) => {
     authorId: Joi.string().hex().length(24),
     slug: Joi.string().min(1),
     category: Joi.string().min(1),
-    searchTerm: Joi.string().min(1),
+    searchTerm: Joi.string().max(100),
+    // searchTerm: Joi.string().allow("").max(100),
   }).unknown(true);
   try {
+    // We will use this to safely process any special characters (like +, %26, etc.) that are URL-encoded.
+    const cleanedQuery = {};
+    for (const key in req.query) {
+      const decodedValue = decodeURIComponent(req.query[key]);
+      if (decodedValue !== "") {
+        cleanedQuery[key] = decodedValue;
+      }
+    }
     // Check if the queries in request from the client side is apply the rules that i put them in Joi Package
-    const { value: validatedQuery, error } = querySchema.validate(req.query);
+    const { value: validatedQuery, error } = querySchema.validate(cleanedQuery);
+
     if (error) {
       return next(errorHandler(400, error.details[0].message));
     }
@@ -227,7 +237,10 @@ export const getPosts = async (req, res, next) => {
     if (postId) query._id = postId;
     if (authorId) query.authorId = authorId;
     if (slug) query.slug = { $regex: slug, $options: "i" };
-    if (category) query.category = { $regex: category, $options: "i" };
+    //  This means: "Only filter by category if it is not 'Uncategorized'."
+    if (category && category !== "Uncategorized") {
+      if (category) query.category = { $regex: category, $options: "i" };
+    }
     if (searchTerm) {
       query.$or = [
         { title: { $regex: searchTerm, $options: "i" } },

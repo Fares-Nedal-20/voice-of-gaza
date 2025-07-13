@@ -11,6 +11,7 @@ import CreatePost from "./pages/CreatePost";
 import WriterOnlyPrivateRoute from "./components/WriterOnlyPrivateRoute";
 import UpdatePost from "./pages/UpdatePost";
 import PostPage from "./pages/PostPage";
+import Search from "./pages/Search";
 export default function App() {
   return (
     <BrowserRouter>
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/search" element={<Search />} />
         </Route>
         <Route element={<WriterOnlyPrivateRoute />}>
           <Route path="/create-post" element={<CreatePost />} />
