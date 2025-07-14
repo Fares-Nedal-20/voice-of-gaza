@@ -91,9 +91,9 @@ export const createComment = async (req, res, next) => {
 };
 
 export const getComments = async (req, res, next) => {
-  if (req.user.role !== "admin" && req.user.role !== "writer") {
-    return next(errorHandler(401, "You are not allowed to show comments!"));
-  }
+  // if (req.user.role !== "admin" && req.user.role !== "writer") {
+  //   return next(errorHandler(401, "You are not allowed to show comments!"));
+  // }
   const querySchema = Joi.object({
     startIndex: Joi.number().integer().min(0).default(0),
     limit: Joi.number().integer().min(1).max(18).default(9),

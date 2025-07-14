@@ -28,6 +28,7 @@ export default function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  console.log(location.pathname, location.search);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -69,7 +70,10 @@ export default function Header() {
           className=" h-10 w-14 rounded-full object-contain"
         />
       </Link>
-      <form onSubmit={handleSubmitSearch} className="hidden md:inline">
+      <form
+        onSubmit={handleSubmitSearch}
+        className="hidden md:inline outline-none"
+      >
         <TextInput
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -77,7 +81,7 @@ export default function Header() {
           type="text"
           placeholder="Search..."
           rightIcon={AiOutlineSearch}
-          value={searchTerm}
+          defaultValue={path === "/search" ? searchTerm : ""}
         />
       </form>
       <Link to={"/search"}>
