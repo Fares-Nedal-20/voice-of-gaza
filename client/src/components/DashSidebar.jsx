@@ -52,7 +52,9 @@ export default function DashSidebar() {
           <SidebarItem
             icon={HiUser}
             active={tab === "profile"}
-            label={currentUser.role}
+            label={
+              currentUser.role[0].toUpperCase() + currentUser.role.slice(1)
+            }
             labelColor="dark"
             as={"div"}
           >

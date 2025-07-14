@@ -172,12 +172,14 @@ export default function DashComments() {
           <>
             <Table hoverable className="shadow-md bg-white">
               <TableHead>
-                <TableHeadCell>#</TableHeadCell>
-                <TableHeadCell>Updated At</TableHeadCell>
-                <TableHeadCell>Content</TableHeadCell>
-                <TableHeadCell>number of likes</TableHeadCell>
-                <TableHeadCell>Username</TableHeadCell>
-                <TableHeadCell>Delete</TableHeadCell>
+                <TableRow>
+                  <TableHeadCell>#</TableHeadCell>
+                  <TableHeadCell>Updated At</TableHeadCell>
+                  <TableHeadCell>Content</TableHeadCell>
+                  <TableHeadCell>number of likes</TableHeadCell>
+                  <TableHeadCell>Username</TableHeadCell>
+                  <TableHeadCell>Delete</TableHeadCell>
+                </TableRow>
               </TableHead>
               <TableBody>
                 {comments &&

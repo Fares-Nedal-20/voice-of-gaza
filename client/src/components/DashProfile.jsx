@@ -39,6 +39,7 @@ export default function DashProfile() {
   const [showMore, setShowMore] = useState(false);
   const [errorThatRelatedToShowPosts, setErrorThatRelatedToShowPosts] =
     useState(null);
+  const [userUpdatedSuccessfuly, setUserUpdatedSuccessfully] = useState(false);
 
   const { currentUser, loading, error } = useSelector((state) => state.user);
 
@@ -162,6 +163,7 @@ export default function DashProfile() {
       dispatch(updateUserFailure("No changes made"));
       return;
     }
+    setUserUpdatedSuccessfully(false);
     try {
       const res = await fetch(`/api/user/updateUser/${currentUser._id}`, {
         method: "PUT",
@@ -173,13 +175,16 @@ export default function DashProfile() {
       const data = await res.json();
       if (!res.ok) {
         dispatch(updateUserFailure(data.message));
+        setUserUpdatedSuccessfully(false);
         return;
       }
       if (res.ok) {
         dispatch(updateUserSuccess(data));
+        setUserUpdatedSuccessfully(true);
       }
     } catch (error) {
       dispatch(updateUserFailure(error.message));
+      setUserUpdatedSuccessfully(false);
     }
   };
 
@@ -319,7 +324,7 @@ export default function DashProfile() {
             />
           </div>
           <span className="bg-slate-700 w-fit px-2 py-1 text-xs rounded-lg text-white font-semibold mx-auto">
-            {currentUser.role}
+            {currentUser.role[0].toUpperCase() + currentUser.role.slice(1)}
           </span>
           <input
             hidden
@@ -388,6 +393,9 @@ export default function DashProfile() {
             <Alert color="failure">
               {error || imageUploadingError || errorThatRelatedToShowPosts}
             </Alert>
+          )}
+          {userUpdatedSuccessfuly && (
+            <Alert color="success">User updated successfully</Alert>
           )}
         </form>
         <div className="w-full max-w-7xl mx-auto">

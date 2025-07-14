@@ -221,13 +221,15 @@ export default function DashPosts() {
       <div className="table-auto md:mx-auto overflow-x-auto scrollbar scrollbar-thumb-slate-700 scrollbar-track-slate-300">
         <Table hoverable className="shadow-md bg-white">
           <TableHead>
-            <TableHeadCell>#</TableHeadCell>
-            <TableHeadCell>Updated At</TableHeadCell>
-            <TableHeadCell>Post Image</TableHeadCell>
-            <TableHeadCell>Author</TableHeadCell>
-            <TableHeadCell>Title</TableHeadCell>
-            <TableHeadCell>Category</TableHeadCell>
-            <TableHeadCell>Edit/Delete</TableHeadCell>
+            <TableRow>
+              <TableHeadCell>#</TableHeadCell>
+              <TableHeadCell>Updated At</TableHeadCell>
+              <TableHeadCell>Post Image</TableHeadCell>
+              <TableHeadCell>Author</TableHeadCell>
+              <TableHeadCell>Title</TableHeadCell>
+              <TableHeadCell>Category</TableHeadCell>
+              <TableHeadCell>Edit/Delete</TableHeadCell>
+            </TableRow>
           </TableHead>
           <TableBody className="divide-y-1 divide-gray-200">
             {posts &&

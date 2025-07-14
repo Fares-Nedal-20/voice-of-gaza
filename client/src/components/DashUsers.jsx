@@ -213,13 +213,15 @@ export default function DashUsers() {
           <>
             <Table hoverable className="shadow-md bg-white">
               <TableHead>
-                <TableHeadCell>#</TableHeadCell>
-                <TableHeadCell>Created At</TableHeadCell>
-                <TableHeadCell>Profile Picture</TableHeadCell>
-                <TableHeadCell>Username</TableHeadCell>
-                <TableHeadCell>Email</TableHeadCell>
-                <TableHeadCell>Role</TableHeadCell>
-                <TableHeadCell>Delete</TableHeadCell>
+                <TableRow>
+                  <TableHeadCell>#</TableHeadCell>
+                  <TableHeadCell>Created At</TableHeadCell>
+                  <TableHeadCell>Profile Picture</TableHeadCell>
+                  <TableHeadCell>Username</TableHeadCell>
+                  <TableHeadCell>Email</TableHeadCell>
+                  <TableHeadCell>Role</TableHeadCell>
+                  <TableHeadCell>Delete</TableHeadCell>
+                </TableRow>
               </TableHead>
               <TableBody>
                 {users &&
@@ -273,7 +275,7 @@ export default function DashUsers() {
             {users.length > 0 && showMore && (
               <button
                 onClick={handleShowMore}
-                className="text-teal-500 cursor-pointer my-7 text-center w-full"
+                className="text-teal-500 cursor-pointer my-7 text-center w-full hover:underline"
               >
                 Show More
               </button>

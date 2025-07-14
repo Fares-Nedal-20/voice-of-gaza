@@ -22,7 +22,6 @@ export default function DashboardComp() {
   const [usersRes, setUsersRes] = useState({});
   const [postsRes, setPostsRes] = useState({});
   const [commentsRes, setCommentsRes] = useState({});
-  console.log(usersRes, postsRes, commentsRes);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -123,8 +122,10 @@ export default function DashboardComp() {
             </div>
             <Table hoverable>
               <TableHead>
-                <TableHeadCell>User Image</TableHeadCell>
-                <TableHeadCell>Username</TableHeadCell>
+                <TableRow>
+                  <TableHeadCell>User Image</TableHeadCell>
+                  <TableHeadCell>Username</TableHeadCell>
+                </TableRow>
               </TableHead>
               <TableBody className="divide-y divide-gray-200">
                 {usersRes.users?.map((user) => (
@@ -154,13 +155,15 @@ export default function DashboardComp() {
             </div>
             <Table hoverable>
               <TableHead>
-                <TableHeadCell>Post Image</TableHeadCell>
-                <TableHeadCell>Post Title</TableHeadCell>
-                <TableHeadCell>Post Category</TableHeadCell>
+                <TableRow>
+                  <TableHeadCell>Post Image</TableHeadCell>
+                  <TableHeadCell>Post Title</TableHeadCell>
+                  <TableHeadCell>Post Category</TableHeadCell>
+                </TableRow>
               </TableHead>
               <TableBody className="divide-y divide-gray-200">
                 {postsRes.posts?.map((post) => (
-                  <TableRow>
+                  <TableRow key={post._id}>
                     <TableCell>
                       <img
                         className="w-14 h-12 rounded-md object-cover bg-gray-500"
@@ -190,12 +193,14 @@ export default function DashboardComp() {
           </div>
           <Table hoverable>
             <TableHead>
-              <TableHeadCell>Comment Content</TableHeadCell>
-              <TableHeadCell># Of Likes</TableHeadCell>
+              <TableRow>
+                <TableHeadCell>Comment Content</TableHeadCell>
+                <TableHeadCell># Of Likes</TableHeadCell>
+              </TableRow>
             </TableHead>
             <TableBody className="divide-y divide-gray-200">
               {commentsRes.comments?.map((comment) => (
-                <TableRow>
+                <TableRow key={comment._id}>
                   <TableCell className="font-medium truncate">
                     {comment.content}
                   </TableCell>
