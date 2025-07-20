@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CommentSection from "../components/CommentSection";
+import TrendingPostByComments from "../components/TrendingPostByComments";
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -26,7 +27,7 @@ export default function PostPage() {
     };
     fetchPost();
   }, [postSlug]);
-  
+
   return (
     <div className="p-6 flex flex-col gap-4">
       <h1
@@ -57,6 +58,9 @@ export default function PostPage() {
         className="post-content w-full max-w-4xl mx-auto"
         dangerouslySetInnerHTML={{ __html: post.content }}
       ></div>
+      <div className="max-w-4xl w-full mx-auto mb-7">
+        <TrendingPostByComments />
+      </div>
       <CommentSection post={post} />
     </div>
   );

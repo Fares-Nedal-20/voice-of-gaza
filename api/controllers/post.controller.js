@@ -163,6 +163,7 @@ export const getPosts = async (req, res, next) => {
     startIndex: Joi.number().integer().min(0).default(0),
     limit: Joi.number().integer().min(1).max(18).default(9),
     sort: Joi.string().valid("asc", "desc").default("desc"),
+    sortBy: Joi.string().valid("updatedAt", "comments").default("updatedAt"),
     postId: Joi.string().hex().length(24),
     authorId: Joi.string().hex().length(24),
     slug: Joi.string().min(1),
@@ -190,6 +191,7 @@ export const getPosts = async (req, res, next) => {
       startIndex,
       limit,
       sort,
+      sortBy,
       postId,
       authorId,
       slug,
@@ -198,6 +200,7 @@ export const getPosts = async (req, res, next) => {
     } = validatedQuery;
 
     const sortDirection = sort === "asc" ? 1 : -1;
+    const sortField = sortBy === "comments" ? "commentsCount" : "updatedAt";
 
     // this code is work but its not clean and slow
 
@@ -256,7 +259,7 @@ export const getPosts = async (req, res, next) => {
 
     const [posts, totalPosts, lastMonthPosts] = await Promise.all([
       Post.find(query)
-        .sort({ updatedAt: sortDirection })
+        .sort({ [sortField]: sortDirection })
         .skip(startIndex)
         .limit(limit),
       Post.countDocuments(query), // Count based on the same filters

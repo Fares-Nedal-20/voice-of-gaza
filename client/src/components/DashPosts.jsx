@@ -228,6 +228,7 @@ export default function DashPosts() {
               <TableHeadCell>Author</TableHeadCell>
               <TableHeadCell>Title</TableHeadCell>
               <TableHeadCell>Category</TableHeadCell>
+              <TableHeadCell>Comments Count</TableHeadCell>
               <TableHeadCell>Edit/Delete</TableHeadCell>
             </TableRow>
           </TableHead>
@@ -260,6 +261,7 @@ export default function DashPosts() {
                       : post.title}
                   </TableCell>
                   <TableCell>{post.category}</TableCell>
+                  <TableCell className="flex flex-col items-center mt-3">{post.commentsCount}</TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1 items-center">
                       <Link to={`/update-post/${post._id}`}>

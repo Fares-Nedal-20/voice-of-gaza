@@ -44,10 +44,6 @@ const postSchema = new mongoose.Schema(
       ],
       default: "Uncategorized",
     },
-    likesCount: {
-      type: Number,
-      default: 0,
-    },
     commentsCount: {
       type: Number,
       default: 0,

@@ -177,7 +177,7 @@ export default function CommentSection({ post }) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto flex flex-col gap-4 mt-[-50px]">
+    <div className="w-full max-w-2xl mx-auto flex flex-col gap-4">
       {currentUser ? (
         <>
           <div className="text-sm flex gap-1 items-center font-medium">
