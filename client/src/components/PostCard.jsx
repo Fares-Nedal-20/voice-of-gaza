@@ -14,9 +14,14 @@ export default function PostCard({ post }) {
         />
       </Link>
       <div className="p-3 flex flex-col gap-2">
-        <p className="text-lg font-semibold line-clamp-1 text-gray-800">
-          {post.title}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-lg font-semibold line-clamp-1 text-gray-800 truncate">
+            {post.title.length > 35
+              ? `${post.title.slice(0, 35)}...`
+              : post.title} 
+          </p>
+          <span className="text-xs text-gray-600">{post.views} Views</span>
+        </div>
         <span className="italic text-sm">{post.category}</span>
         <p
           dangerouslySetInnerHTML={{ __html: post.content }}

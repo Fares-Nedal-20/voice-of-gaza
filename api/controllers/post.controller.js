@@ -240,6 +240,19 @@ export const getPosts = async (req, res, next) => {
     if (postId) query._id = postId;
     if (authorId) query.authorId = authorId;
     if (slug) query.slug = { $regex: slug, $options: "i" };
+
+    // Increment views when accessing by postId or slug
+    if (postId) {
+      await Post.findByIdAndUpdate(postId, { $inc: { views: 1 } });
+    } else if (slug) {
+      const postToUpdate = await Post.findOne({
+        slug: { $regex: slug, $options: "i" },
+      });
+      if (postToUpdate) {
+        await Post.findByIdAndUpdate(postToUpdate._id, { $inc: { views: 1 } });
+      }
+    }
+
     //  This means: "Only filter by category if it is not 'Uncategorized'."
     if (category && category !== "Uncategorized") {
       if (category) query.category = { $regex: category, $options: "i" };
@@ -283,6 +296,18 @@ export const deletePost = async (req, res, next) => {
   try {
     await Post.findByIdAndDelete(req.params.postId);
     res.status(200).json("Post has been deleted!");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTopViewedPost = async (req, res, next) => {
+  try {
+    const post = await Post.findOne().sort({ views: -1 }).limit(1)
+    if (!post) {
+      return nexr(errorHandler(404, "Post not found!"));
+    }
+    res.status(200).json(post);
   } catch (error) {
     next(error);
   }

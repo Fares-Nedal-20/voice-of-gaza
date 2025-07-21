@@ -78,7 +78,6 @@ export const createComment = async (req, res, next) => {
       { new: true }
     ).select("commentsCount");
 
-    console.log(updatedPost);
 
     res.status(201).json({
       message: "Comment created successfully",
@@ -102,7 +101,7 @@ export const getComments = async (req, res, next) => {
     postId: Joi.string().hex().length(24),
     userId: Joi.string().hex().length(24),
     content: Joi.string().min(1).max(100),
-  }).unknown(true);;
+  }).unknown(true);
 
   try {
     const { value: validatedQuery, error } = querySchema.validate(req.query);
@@ -159,6 +158,10 @@ export const deleteComments = async (req, res, next) => {
     if (!commentExist) {
       return next(errorHandler(404, "Comment not found!"));
     }
+    await Post.findByIdAndUpdate(commentExist.postId, {
+      $inc: { commentsCount: -1 },
+    });
+
     await Comment.findByIdAndDelete(commentId);
 
     res.status(200).json("Comment is deleted successfuly!");

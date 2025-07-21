@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CommentSection from "../components/CommentSection";
 import TrendingPostByComments from "../components/TrendingPostByComments";
+import TrendingPostByViews from "../components/TrendingPostByViews";
+import { Carousel } from "flowbite-react";
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -37,7 +39,6 @@ export default function PostPage() {
         <span className="text-slate-900">Title: </span>
         {post.title}
       </h1>
-
       <img
         src={post.image}
         alt="Post cover"
@@ -58,8 +59,12 @@ export default function PostPage() {
         className="post-content w-full max-w-4xl mx-auto"
         dangerouslySetInnerHTML={{ __html: post.content }}
       ></div>
-      <div className="max-w-4xl w-full mx-auto mb-7">
-        <TrendingPostByComments />
+      
+      <div className="max-w-4xl w-full mx-auto mb-7 carousel-wrapper">
+        <Carousel indicators={false}>
+          <TrendingPostByComments />
+          <TrendingPostByViews />
+        </Carousel>
       </div>
       <CommentSection post={post} />
     </div>
