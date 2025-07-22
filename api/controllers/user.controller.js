@@ -223,7 +223,7 @@ export const followUser = async (req, res, next) => {
       await targetUser.save();
       await currentUser.save();
 
-      return res.status(200).json({ message: "Followed successfully" });
+      return res.status(200).json({ message: "Followed successfully!" });
     } else {
       // Unfollow
       targetUser.followers = targetUser.followers.filter(
@@ -236,7 +236,7 @@ export const followUser = async (req, res, next) => {
       await targetUser.save();
       await currentUser.save();
 
-      return res.status(200).json({ message: "Unfollowed successfully" });
+      return res.status(200).json({ message: "Unfollowed successfully!" });
     }
   } catch (error) {
     next(error);

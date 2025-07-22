@@ -219,6 +219,8 @@ export default function DashUsers() {
                   <TableHeadCell>Profile Picture</TableHeadCell>
                   <TableHeadCell>Username</TableHeadCell>
                   <TableHeadCell>Email</TableHeadCell>
+                  <TableHeadCell>Following</TableHeadCell>
+                  <TableHeadCell>Followers</TableHeadCell>
                   <TableHeadCell>Role</TableHeadCell>
                   <TableHeadCell>Delete</TableHeadCell>
                 </TableRow>
@@ -247,6 +249,12 @@ export default function DashUsers() {
                       </TableCell>
                       <TableCell className="font-medium truncate">
                         {user.email}
+                      </TableCell>
+                      <TableCell className="text-center text-green-500">
+                        {user.following?.length || 0}
+                      </TableCell>
+                      <TableCell className="text-center text-yellow-500">
+                        {user.followers?.length || 0}
                       </TableCell>
                       <TableCell
                         className={`font-medium ${
