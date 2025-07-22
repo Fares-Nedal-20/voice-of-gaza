@@ -1,6 +1,9 @@
 import Joi from "joi";
 import Post from "../models/post.model.js";
 import { errorHandler } from "../utils/error.js";
+import { getFollowers } from "../utils/getFollowers.js";
+import Notification from "./../models/notification.model.js";
+import User from "../models/user.model.js";
 
 const keywords = [
   "gaza",
@@ -83,7 +86,23 @@ export const createPost = async (req, res, next) => {
       authorId: req.user.id,
       slug,
     });
-    await newPost.save();
+    const savedPost = await newPost.save();
+
+    const author = await User.findById(req.user.id);
+
+    const followers = await getFollowers(req.user.id);
+    for (const follower of followers) {
+      await Notification.create({
+        sender: req.user.id,
+        receiver: follower._id,
+        type: "post",
+        post: savedPost._id,
+        message: `${author.username} has published a new post`,
+      });
+    }
+
+    console.log(followers);
+
     res.status(201).json(newPost);
   } catch (error) {
     next(error);
@@ -303,7 +322,7 @@ export const deletePost = async (req, res, next) => {
 
 export const getTopViewedPost = async (req, res, next) => {
   try {
-    const post = await Post.findOne().sort({ views: -1 }).limit(1)
+    const post = await Post.findOne().sort({ views: -1 }).limit(1);
     if (!post) {
       return nexr(errorHandler(404, "Post not found!"));
     }
