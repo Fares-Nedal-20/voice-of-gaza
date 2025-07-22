@@ -26,6 +26,18 @@ const userSchema = new mongoose.Schema(
       enum: ["reader", "writer", "admin"],
       default: "reader",
     },
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );

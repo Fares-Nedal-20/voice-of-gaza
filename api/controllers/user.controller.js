@@ -193,3 +193,52 @@ export const getUsers = async (req, res, next) => {
     next(error);
   }
 };
+
+export const followUser = async (req, res, next) => {
+  try {
+    const { targetUserId } = req.params;
+    const currentUserId = req.user.id;
+
+    if (targetUserId === currentUserId) {
+      return next(errorHandler(401, "You are not allowed to follow yourself!"));
+    }
+
+    const targetUser = await User.findById(targetUserId);
+    const currentUser = await User.findById(currentUserId);
+
+    if (!targetUser || !currentUser) {
+      return next(errorHandler(404, "User not found!"));
+    }
+
+    const isFollowing = targetUser.followers.some(
+      (id) => id.toString() === currentUserId.toString()
+    );
+    // console.log(isFollowing);
+
+    if (!isFollowing) {
+      // Follow
+      targetUser.followers.push(currentUserId);
+      currentUser.following.push(targetUserId);
+
+      await targetUser.save();
+      await currentUser.save();
+
+      return res.status(200).json({ message: "Followed successfully" });
+    } else {
+      // Unfollow
+      targetUser.followers = targetUser.followers.filter(
+        (id) => id.toString() !== currentUserId.toString()
+      );
+      currentUser.following = currentUser.following.filter(
+        (id) => id.toString() !== targetUserId.toString()
+      );
+
+      await targetUser.save();
+      await currentUser.save();
+
+      return res.status(200).json({ message: "Unfollowed successfully" });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
