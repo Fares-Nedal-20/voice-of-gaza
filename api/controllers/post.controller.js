@@ -96,8 +96,7 @@ export const createPost = async (req, res, next) => {
         sender: req.user.id,
         receiver: follower._id,
         type: "post",
-        post: savedPost._id,
-        message: `${author.username} has published a new post`,
+        message: `${author.username} has published a new post.`,
       });
     }
 

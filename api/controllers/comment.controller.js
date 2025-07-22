@@ -3,6 +3,8 @@ import Comment from "../models/comment.model.js";
 import { errorHandler } from "../utils/error.js";
 import Post from "./../models/post.model.js";
 import mongoose from "mongoose";
+import Notification from "../models/notification.model.js";
+import User from "../models/user.model.js";
 
 const bannedWords = [
   "kill",
@@ -72,12 +74,22 @@ export const createComment = async (req, res, next) => {
 
     await newComment.populate("userId", "username email profilePicture");
 
+    const userComment = await User.findById(req.user.id);
+
+    if (post.authorId.toString() !== req.user.id.toString()) {
+      await Notification.create({
+        sender: req.user.id,
+        receiver: post.authorId,
+        type: "comment",
+        message: `${userComment.username} commented on your post.`,
+      });
+    }
+
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
       { $inc: { commentsCount: 1 } },
       { new: true }
     ).select("commentsCount");
-
 
     res.status(201).json({
       message: "Comment created successfully",
@@ -224,11 +236,22 @@ export const likeComment = async (req, res, next) => {
 
     if (hasLiked) {
       comment.likes.pull(userId);
+      await comment.save();
     } else {
       comment.likes.push(userId);
-    }
+      const savedComment = await comment.save();
 
-    await comment.save();
+      const userLike = await User.findById(req.user.id);
+
+      if (savedComment.userId.toString() !== req.user.id) {
+        await Notification.create({
+          sender: req.user.id,
+          receiver: savedComment.userId,
+          type: "like",
+          message: `${userLike.username} liked your comment`,
+        });
+      }
+    }
 
     res.status(200).json({
       message: hasLiked ? "Comment unliked" : "Comment liked",

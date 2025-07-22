@@ -3,6 +3,7 @@ import { errorHandler } from "../utils/error.js";
 import validator from "validator";
 import bcryptjs from "bcryptjs";
 import Joi from "joi";
+import Notification from "./../models/notification.model.js";
 
 export const test = (req, res) => {
   res.json({ message: "Api route is working!" });
@@ -223,6 +224,13 @@ export const followUser = async (req, res, next) => {
       await targetUser.save();
       await currentUser.save();
 
+      await Notification.create({
+        sender: currentUserId,
+        receiver: targetUserId,
+        type: "follow",
+        message: `${currentUser.username} started following you.`,
+      });
+
       return res.status(200).json({ message: "Followed successfully!" });
     } else {
       // Unfollow
@@ -235,6 +243,13 @@ export const followUser = async (req, res, next) => {
 
       await targetUser.save();
       await currentUser.save();
+
+      await Notification.create({
+        sender: currentUserId,
+        receiver: targetUserId,
+        type: "follow",
+        message: `${currentUser.username} has unfollowed you.`,
+      });
 
       return res.status(200).json({ message: "Unfollowed successfully!" });
     }
