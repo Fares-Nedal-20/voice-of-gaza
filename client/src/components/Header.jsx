@@ -85,9 +85,60 @@ export default function Header() {
     };
 
     fetchNotifications();
-  }, []);
+  }, [currentUser, location.pathname]);
 
   console.log(notifications, unreadCount);
+
+  const handleMarkAsRead = async (notificationId) => {
+    try {
+      const res = await fetch(
+        `/api/notification/markAsRead/${notificationId}`,
+        { method: "PUT" }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        return;
+      }
+      setUnreadCount((prev) => prev - 1);
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notification) =>
+          notification._id === notificationId
+            ? { ...notification, isRead: true }
+            : notification
+        )
+      );
+      // for (const notification of notifications) {
+      //   if (notification._id === notificationId) {
+      //     setNotifications([...notifications, (notification.isRead = true)]);
+      //   }
+      // }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      const res = await fetch(`/api/notification/markAllAsRead`, {
+        method: "PUT",
+      });
+      if (!res.ok) {
+        return;
+      }
+      setUnreadCount(0);
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notification) => ({
+          ...notification,
+          isRead: true,
+        }))
+      );
+      // for (const notification of notifications) {
+      //   setNotifications([...notifications, (notification.isRead = true)]);
+      // }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Navbar className="border-b border-gray-300 shadow-md">
@@ -132,13 +183,24 @@ export default function Header() {
               </div>
             }
           >
-            <DropdownHeader className="font-medium text-gray-600">
-              {unreadCount === 0 ? "No notifications" : "Notifications"}
+            <DropdownHeader className="flex items-center justify-between">
+              <span className="font-medium text-gray-600">
+                {notifications.length === 0
+                  ? "No notifications"
+                  : "Notifications"}
+              </span>
+              <span
+                onClick={handleMarkAllAsRead}
+                className="text-xs text-green-400 hover:underline cursor-pointer"
+              >
+                Mark all as read
+              </span>
             </DropdownHeader>
             <div className="max-h-80 overflow-y-auto">
               {notifications.map((notification) => (
                 <div key={notification._id}>
                   <DropdownItem
+                    onClick={() => handleMarkAsRead(notification._id)}
                     className={`flex flex-col items-start gap-2 ${
                       !notification.isRead && "bg-gray-100"
                     }`}
@@ -164,7 +226,8 @@ export default function Header() {
                         </span>
                       )}
                     </div>
-                    <div>
+                    <div className="flex items-center gap-2">
+                      <img className="w-9 h-9 rounded-full" src={notification.sender.profilePicture} alt="" />
                       <p>{notification.message}</p>
                     </div>
                   </DropdownItem>

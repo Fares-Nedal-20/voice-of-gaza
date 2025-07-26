@@ -13,7 +13,7 @@ export const getUserNotifications = async (req, res, next) => {
       receiver: receiverId,
     }).sort({
       createdAt: -1,
-    });
+    }).populate("sender", "username profilePicture");
     res.status(200).json(notifications);
   } catch (error) {
     next(error);
