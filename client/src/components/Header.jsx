@@ -189,12 +189,14 @@ export default function Header() {
                   ? "No notifications"
                   : "Notifications"}
               </span>
-              <span
-                onClick={handleMarkAllAsRead}
-                className="text-xs text-green-400 hover:underline cursor-pointer"
-              >
-                Mark all as read
-              </span>
+              {notifications.length > 0 && (
+                <span
+                  onClick={handleMarkAllAsRead}
+                  className="text-xs text-green-400 hover:underline cursor-pointer"
+                >
+                  Mark all as read
+                </span>
+              )}
             </DropdownHeader>
             <div className="max-h-80 overflow-y-auto">
               {notifications.map((notification) => (
@@ -227,7 +229,11 @@ export default function Header() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <img className="w-9 h-9 rounded-full" src={notification.sender.profilePicture} alt="" />
+                      <img
+                        className="w-9 h-9 rounded-full"
+                        src={notification.sender.profilePicture}
+                        alt=""
+                      />
                       <p>{notification.message}</p>
                     </div>
                   </DropdownItem>
