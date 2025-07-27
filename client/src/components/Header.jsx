@@ -10,6 +10,11 @@ import {
   DropdownHeader,
   DropdownItem,
   DropdownDivider,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  Select,
+  Textarea,
 } from "flowbite-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -32,6 +37,7 @@ export default function Header() {
   const [searchTerm, setSearchTerm] = useState("");
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showModal, setShowModal] = useState(false);
   console.log(location.pathname, location.search);
 
   useEffect(() => {
@@ -294,7 +300,50 @@ export default function Header() {
         <NavbarLink as={"div"} active={path === "/posts"}>
           <Link to={"/posts"}>Posts</Link>
         </NavbarLink>
+        {currentUser?.role === "reader" && (
+          <NavbarLink
+            className="cursor-pointer"
+            as={"div"}
+            onClick={() => setShowModal(true)}
+          >
+            Request to role
+          </NavbarLink>
+        )}
       </NavbarCollapse>
+      {showModal && (
+        <Modal
+          show={showModal}
+          size="lg"
+          popup
+          onClose={() => setShowModal(false)}
+        >
+          <ModalHeader />
+          <ModalBody className="text-center flex flex-col gap-4">
+            <h2 className="text-2xl font-semibold text-red-500">
+              Request Role Upgrade
+            </h2>
+            <p className="text-gray-500 text-sm">
+              Your request will be considered by the admin, and then you will be
+              answered with a notice.
+            </p>
+            <form className="flex flex-col gap-4">
+              <Textarea
+                id="message"
+                rows={3}
+                placeholder="Please explain why you would like to change your role..."
+              />
+              <Button
+                color={"teal"}
+                outline
+                type="submit"
+                className="cursor-pointer"
+              >
+                Send Request
+              </Button>
+            </form>
+          </ModalBody>
+        </Modal>
+      )}
     </Navbar>
   );
 }
