@@ -15,6 +15,8 @@ import {
   ModalBody,
   Select,
   Textarea,
+  Spinner,
+  Alert,
 } from "flowbite-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -38,7 +40,12 @@ export default function Header() {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  console.log(location.pathname, location.search);
+  const [message, setMessage] = useState("");
+  const [requestRoleError, setRequestRoleError] = useState(null);
+  const [requestRoleSuccess, setRequestRoleSuccess] = useState(null);
+  const [loading, setLoading] = useState(false);
+  console.log(message);
+  // console.log(location.pathname, location.search);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -93,7 +100,7 @@ export default function Header() {
     fetchNotifications();
   }, [currentUser, location.pathname]);
 
-  console.log(notifications, unreadCount);
+  // console.log(notifications, unreadCount);
 
   const handleMarkAsRead = async (notificationId) => {
     try {
@@ -143,6 +150,38 @@ export default function Header() {
       // }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setRequestRoleSuccess(null);
+    setRequestRoleError(null);
+    try {
+      const res = await fetch(
+        `/api/roleRequest//request-role/${currentUser._id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setRequestRoleError(data.message);
+        setLoading(false);
+        return;
+      }
+      if (res.ok) {
+        setRequestRoleSuccess(data.message);
+        setLoading(false);
+      }
+    } catch (error) {
+      setRequestRoleError(error.message);
+      setLoading(false);
     }
   };
 
@@ -326,21 +365,25 @@ export default function Header() {
               Your request will be considered by the admin, and then you will be
               answered with a notice.
             </p>
-            <form className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Textarea
                 id="message"
                 rows={3}
                 placeholder="Please explain why you would like to change your role..."
+                onChange={(e) => setMessage(e.target.value)}
               />
               <Button
                 color={"teal"}
                 outline
                 type="submit"
-                className="cursor-pointer"
+                className="cursor-pointer flex items-center gap-1"
               >
+                {loading && <Spinner size="sm" />}
                 Send Request
               </Button>
             </form>
+            {requestRoleError && <Alert color="failure">{requestRoleError}</Alert>}
+            {requestRoleSuccess && <Alert color="success">{requestRoleSuccess}</Alert>}
           </ModalBody>
         </Modal>
       )}
