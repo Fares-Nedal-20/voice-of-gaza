@@ -17,7 +17,8 @@ const roleRequestSchema = new mongoose.Schema(
     },
     message: {
       type: String,
-      maxlength: 500,
+      maxlength: 200,
+      required: true
     },
     status: {
       type: String,

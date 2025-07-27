@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.route.js";
 import postRoutes from "./routes/post.route.js";
 import commentRoutes from "./routes/comment.route.js";
 import notificationRoutes from "./routes/notification.route.js";
+import roleRequestRoutes from "./routes/roleRequest.route.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -29,6 +30,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
 app.use("/api/notification", notificationRoutes);
+app.use("/api/roleRequest", roleRequestRoutes);
 
 app.use((err, req, res, next) => {
   if (err) {
