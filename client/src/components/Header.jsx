@@ -361,7 +361,10 @@ export default function Header() {
             <h2 className="text-2xl font-semibold text-red-500">
               Request Role Upgrade
             </h2>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-600 text-sm font-medium">
+              Request from admin to change your role from reader to writer.
+            </p>
+            <p className="text-gray-500 text-xs font-medium">
               Your request will be considered by the admin, and then you will be
               answered with a notice.
             </p>
@@ -371,6 +374,7 @@ export default function Header() {
                 rows={3}
                 placeholder="Please explain why you would like to change your role..."
                 onChange={(e) => setMessage(e.target.value)}
+                className="placeholder:font-medium"
               />
               <Button
                 color={"teal"}
@@ -378,12 +382,16 @@ export default function Header() {
                 type="submit"
                 className="cursor-pointer flex items-center gap-1"
               >
-                {loading && <Spinner size="sm" />}
+                {loading && <Spinner className="mb-1" size="sm" />}
                 Send Request
               </Button>
             </form>
-            {requestRoleError && <Alert color="failure">{requestRoleError}</Alert>}
-            {requestRoleSuccess && <Alert color="success">{requestRoleSuccess}</Alert>}
+            {requestRoleError && (
+              <Alert color="failure">{requestRoleError}</Alert>
+            )}
+            {requestRoleSuccess && (
+              <Alert color="success">{requestRoleSuccess}</Alert>
+            )}
           </ModalBody>
         </Modal>
       )}

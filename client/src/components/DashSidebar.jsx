@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { signout } from "../redux/user/userSlice";
 import { FaUsers, FaRegNewspaper } from "react-icons/fa";
 import { MdOutlineInsertComment } from "react-icons/md";
+import { GiTeamUpgrade } from "react-icons/gi";
 
 export default function DashSidebar() {
   const location = useLocation();
@@ -81,6 +82,13 @@ export default function DashSidebar() {
                 as={"div"}
               >
                 <Link to={"/dashboard?tab=comments"}>Comments</Link>
+              </SidebarItem>
+              <SidebarItem
+                active={tab === "role-requests"}
+                icon={GiTeamUpgrade}
+                as={"div"}
+              >
+                <Link to={"/dashboard?tab=role-requests"}>Role requests</Link>
               </SidebarItem>
             </>
           )}

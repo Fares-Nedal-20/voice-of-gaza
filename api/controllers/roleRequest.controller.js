@@ -1,5 +1,7 @@
+import Notification from "../models/notification.model.js";
 import RoleRequest from "../models/roleRequest.model.js";
 import { errorHandler } from "../utils/error.js";
+import User from "./../models/user.model.js";
 
 export const createRequestRole = async (req, res, next) => {
   const { userId } = req.params;
@@ -42,6 +44,100 @@ export const createRequestRole = async (req, res, next) => {
     res
       .status(201)
       .json({ message: "Your role request has been submitted successfully." });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getRoleRequests = async (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return next(errorHandler(401, "Only admin can show role requests!"));
+  }
+  try {
+    const roleRequests = await RoleRequest.find({ status: "pending" }).populate(
+      "userId",
+      "username email profilePicture"
+    );
+    res.status(200).json(roleRequests);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const approveRoleRequest = async (req, res, next) => {
+  const { roleRequestId } = req.params;
+  if (req.user.role !== "admin") {
+    return next(
+      errorHandler(401, "You are not authorized to approve role requests.")
+    );
+  }
+  try {
+    const roleRequesst = await RoleRequest.findById(roleRequestId);
+
+    if (!roleRequesst) {
+      return next(errorHandler(404, "Role request not found."));
+    }
+    const roleRequestUpdated = await RoleRequest.findByIdAndUpdate(
+      roleRequesst._id,
+      { status: "approved" },
+      {
+        new: true,
+      }
+    );
+
+    await User.findByIdAndUpdate(roleRequesst.userId, {
+      role: "writer",
+    });
+
+    await Notification.create({
+      sender: req.user.id,
+      receiver: roleRequesst.userId,
+      type: "Role update",
+      message:
+        "Your role request has been approved by admin and you are now a writer.",
+      isRead: false,
+    });
+    return res.status(200).json({
+      message: "Role request has been approved.",
+      data: roleRequestUpdated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const rejectRoleRequest = async (req, res, next) => {
+  const { roleRequestId } = req.params;
+  if (req.user.role !== "admin") {
+    return next(
+      errorHandler(401, "You are not authorized to reject role requests.")
+    );
+  }
+  try {
+    const roleRequesst = await RoleRequest.findById(roleRequestId);
+
+    if (!roleRequesst) {
+      return next(errorHandler(404, "Role request not found."));
+    }
+    const roleRequestUpdated = await RoleRequest.findByIdAndUpdate(
+      roleRequesst._id,
+      { status: "reject" },
+      {
+        new: true,
+      }
+    );
+
+    await Notification.create({
+      sender: req.user.id,
+      receiver: roleRequesst.userId,
+      type: "Role update",
+      message: "Your role request has been rejected by admin.",
+      isRead: false,
+    });
+    return res.status(200).json({
+      message: "Role request has been rejected.",
+      data: roleRequestUpdated,
+    });
   } catch (error) {
     next(error);
   }
